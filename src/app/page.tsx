@@ -31,6 +31,8 @@ import { OnboardingScreen } from "@/components/screens/onboarding";
 import { LookbookScreen } from "@/components/screens/lookbook";
 import { HelpScreen } from "@/components/screens/help";
 import { VariationsScreen } from "@/components/screens/variations";
+import { BrandProfileScreen } from "@/components/screens/brand-profile";
+import { ActivityScreen } from "@/components/screens/activity";
 
 import { Loader2 } from "lucide-react";
 
@@ -132,6 +134,10 @@ export default function Home() {
         return <HelpScreen />;
       case "variations":
         return <VariationsScreen />;
+      case "brand-profile":
+        return <BrandProfileScreen />;
+      case "activity":
+        return <ActivityScreen />;
       default:
         return <HomeScreen />;
     }

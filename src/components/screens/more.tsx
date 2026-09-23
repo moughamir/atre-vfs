@@ -17,6 +17,7 @@ import {
   Moon,
   Heart,
   Layers,
+  TrendingUp,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -54,6 +55,12 @@ export function MoreScreen() {
           hint: "All studios",
         },
         {
+          icon: TrendingUp,
+          label: "Activity",
+          onClick: () => navigate("activity"),
+          hint: "Insights",
+        },
+        {
           icon: Heart,
           label: "Favorites",
           onClick: () => navigate("favorites"),
@@ -67,8 +74,7 @@ export function MoreScreen() {
         {
           icon: User,
           label: "Brand profile",
-          onClick: () =>
-            pushToast({ title: "Coming soon", description: "Brand profile is in the roadmap." }),
+          onClick: () => navigate("brand-profile"),
         },
         {
           icon: Users,

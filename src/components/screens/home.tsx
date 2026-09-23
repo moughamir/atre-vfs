@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
 import { getGreeting, formatPrice } from "@/lib/presets";
-import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock, ShoppingBag, Images } from "lucide-react";
+import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock, ShoppingBag, Images, TrendingUp } from "lucide-react";
 import type { Product, Listing, ProjectSummary, FavoriteImage } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchProjects, fetchFavorites } from "@/lib/api";
@@ -199,22 +199,25 @@ export function HomeScreen() {
         </button>
       </div>
 
-      {/* In-progress banner */}
-      {!loading && inProgress.length > 0 && (
+      {/* Activity + In-progress row */}
+      {!loading && (inProgress.length > 0 || totalImages > 0) && (
         <div className="mt-4 px-5">
           <button
-            onClick={() => navigate("projects")}
+            onClick={() => navigate("activity")}
             className="w-full rounded-2xl bg-foreground text-background p-4 flex items-center gap-3 active:scale-[0.99] transition"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-background/15">
-              <Clock className="h-5 w-5" strokeWidth={1.75} />
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-background/10">
+              <TrendingUp className="h-5 w-5" strokeWidth={1.75} />
             </span>
             <div className="flex-1 text-left">
               <p className="text-[13px] font-medium">
-                {inProgress.length} project{inProgress.length === 1 ? "" : "s"} in progress
+                {totalImages > 0 ? `${totalImages} images · ${listings.length} published` : "View your activity"}
               </p>
               <p className="text-[12px] opacity-75">
-                Pick up where you left off
+                {inProgress.length > 0
+                  ? `${inProgress.length} in progress · `
+                  : ""}
+                See insights & timeline
               </p>
             </div>
             <ChevronRight className="h-4 w-4 opacity-80" />

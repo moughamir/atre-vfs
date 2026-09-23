@@ -376,3 +376,48 @@ Stage Summary:
 - Image Detail now has 5 actions (was 4): Save, Edit, Variations, Download, Share ✓
 - Total screens: 27 (was 25) — added Help, Variations
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-7
+Agent: Z.ai Code (webDevReview cron)
+Task: Brand Profile screen + Activity/Insights screen + Home Activity banner
+
+Work Log:
+- Reviewed worklog.md — CRON-6 completed Help/FAQ, Image Variations, Variations API
+- Ran agent-browser QA on Home/Products/Shop/More/Lookbook/Help — all rendering, no console errors
+- Built Brand Profile screen (`/components/screens/brand-profile.tsx`):
+  - Replaces the placeholder toast on More → Brand profile
+  - Live brand preview card: shows brand name, tagline, aesthetic, and color in a dark gradient card
+  - Brand name + tagline text inputs
+  - Aesthetic selector: 4 presets (Minimal ◯, Luxury ✦, Editorial ❖, Street ◈) with active ring + check
+  - Brand color picker: 6 swatches (Sand, Noir, Blush, Sage, Ivory, Clay) with active ring + check
+  - Saving applies the aesthetic as the default style for new studios + toast confirmation
+- Built Activity/Insights screen (`/components/screens/activity.tsx`):
+  - Fetches projects, listings, and favorites to compute insights
+  - Stats grid (2x2): Studios (count + ready), Images (count + generations), Published (count), Favorites (count)
+  - "Time saved" highlight card: calculates estimated time saved vs traditional photoshoots (4h per generation), displays as "Xh Ym"
+  - Activity timeline: aggregates all events (created, generated, published, favorited) sorted by timestamp, each with icon + label + detail + relative time ("1h", "2d", etc.)
+  - Loading skeletons + empty state
+- Added Activity entry points:
+  - Home: replaced the in-progress banner with an Activity banner ("N images · N published · See insights & timeline") that navigates to Activity
+  - More screen: added "Activity" row in the Library section with TrendingUp icon + "Insights" hint
+- Wired Brand Profile + Activity into types (ScreenId), store tabMap, and page.tsx routing
+- Updated More screen: Brand profile now navigates to the real screen (was a placeholder toast)
+
+Verification Results:
+- Home: Activity banner shows "4 images · 1 published · See insights & timeline" ✓
+- Activity screen: "Your activity" heading, stats grid (1 Studios, 4 Images, 1 Published, 1 Favorites), time saved (4h 0m), timeline with 3 events ✓
+- Activity timeline: "Saved to favorites" (White Linen Shirt, 1h), "Generated 4 images" (White Linen Shirt, 1h), "Created studio" ✓
+- Brand Profile: "Your brand" heading, brand name/tagline inputs, 4 aesthetic presets, 6 brand colors ✓
+- More screen: Library section now has 3 items (My projects, Activity, Favorites) ✓
+- No console errors ✓
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+
+Stage Summary:
+- Brand Profile screen replaces placeholder — brand identity with aesthetic + color that feeds into studio defaults ✓
+- Activity/Insights screen — stats grid, time-saved highlight, and full activity timeline ✓
+- Home now has Activity banner replacing the old in-progress-only banner ✓
+- More screen Library section expanded with Activity entry ✓
+- Total screens: 29 (was 27) — added Brand Profile, Activity
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
