@@ -1,0 +1,74 @@
+// This is your Prisma schema file for Virtual Studio for Fashion Commerce
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   @default("Shirt")
+  color       String?
+  sizeRange   String?
+  price       Float    @default(0)
+  currency    String   @default("EUR")
+  description String?
+  images      String   @default("[]") // JSON array of image URLs/paths
+  status      String   @default("draft") // draft | ready | published | archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  projects StudioProject[]
+  listings Listing[]
+}
+
+model StudioProject {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  model           String   @default("none") // none | woman | man | custom
+  modelPreference String? // natural | elegant | editorial
+  scene           String   @default("studio") // studio | street | lifestyle | editorial
+  style           String   @default("clean") // clean | luxury | summer | editorial | urban | minimal
+  status          String   @default("configuring") // configuring | generating | ready | publishing | published | failed
+  selectedCount   Int      @default(4)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  generations Generation[]
+  listings    Listing[]
+}
+
+model Generation {
+  id        String   @id @default(cuid())
+  projectId String
+  project   StudioProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  prompt    String
+  model     String
+  scene     String
+  style     String
+  status    String   @default("pending") // pending | completed | failed
+  images    String   @default("[]") // JSON array of image URLs
+  createdAt DateTime @default(now())
+}
+
+model Listing {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     StudioProject? @relation(fields: [projectId], references: [id])
+  name        String
+  price       Float
+  currency    String   @default("EUR")
+  description String?
+  mainImage   String
+  images      String   @default("[]") // JSON array
+  status      String   @default("published") // published | archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
