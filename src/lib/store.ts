@@ -8,6 +8,7 @@ import type {
   ModelOption,
   ModelPreference,
   PoseOption,
+  LightingOption,
   SceneOption,
   StyleOption,
   GeneratedImage,
@@ -29,6 +30,7 @@ export interface UserSettings {
   defaultScene: SceneOption;
   defaultStyle: StyleOption;
   defaultPose: PoseOption;
+  defaultLighting: LightingOption;
   generationCount: number; // 1..4
   hasOnboarded: boolean;
 }
@@ -38,6 +40,7 @@ const defaultSettings: UserSettings = {
   defaultScene: "studio",
   defaultStyle: "clean",
   defaultPose: "standing",
+  defaultLighting: "soft",
   generationCount: 4,
   hasOnboarded: false,
 };
@@ -85,6 +88,7 @@ interface AppState {
     modelPreference: ModelPreference | null;
     pose: PoseOption;
     scene: SceneOption;
+    lighting: LightingOption;
     style: StyleOption;
     status: ProjectStatus;
     currentImages: GeneratedImage[];
@@ -127,6 +131,7 @@ interface AppState {
   setStudioModelPreference: (p: ModelPreference | null) => void;
   setStudioPose: (p: PoseOption) => void;
   setStudioScene: (s: SceneOption) => void;
+  setStudioLighting: (l: LightingOption) => void;
   setStudioStyle: (s: StyleOption) => void;
   setStudioStatus: (s: ProjectStatus) => void;
   setStudioImages: (imgs: GeneratedImage[]) => void;
@@ -168,6 +173,7 @@ const initialStudio = {
   modelPreference: null as ModelPreference | null,
   pose: "standing" as PoseOption,
   scene: "studio" as SceneOption,
+  lighting: "soft" as LightingOption,
   style: "clean" as StyleOption,
   status: "configuring" as ProjectStatus,
   currentImages: [] as GeneratedImage[],
@@ -296,6 +302,7 @@ export const useApp = create<AppState>((set, get) => ({
         model: s.defaultModel,
         pose: s.defaultPose,
         scene: s.defaultScene,
+        lighting: s.defaultLighting,
         style: s.defaultStyle,
         status: "configuring",
       },
@@ -313,6 +320,7 @@ export const useApp = create<AppState>((set, get) => ({
     set((s) => ({ studio: { ...s.studio, modelPreference: p } })),
   setStudioPose: (p) => set((s) => ({ studio: { ...s.studio, pose: p } })),
   setStudioScene: (sc) => set((s) => ({ studio: { ...s.studio, scene: sc } })),
+  setStudioLighting: (l) => set((s) => ({ studio: { ...s.studio, lighting: l } })),
   setStudioStyle: (st) => set((s) => ({ studio: { ...s.studio, style: st } })),
   setStudioStatus: (st) => set((s) => ({ studio: { ...s.studio, status: st } })),
   setStudioImages: (imgs) =>

@@ -6,8 +6,8 @@ import { ScreenHeader, ExitStudioConfirm } from "@/components/studio/screen-head
 import { PrimaryCTA } from "@/components/studio/cta";
 import { StudioProgress } from "@/components/studio/studio-progress";
 import { ChoiceCard } from "@/components/studio/choice-card";
-import { SCENE_PRESETS } from "@/lib/presets";
-import { ArrowRight } from "lucide-react";
+import { SCENE_PRESETS, LIGHTING_PRESETS } from "@/lib/presets";
+import { ArrowRight, Sun } from "lucide-react";
 import { useState } from "react";
 import {
   Dialog,
@@ -17,10 +17,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { SceneOption } from "@/lib/types";
+import type { SceneOption, LightingOption } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export function StudioSceneScreen() {
-  const { studio, setStudioScene, navigate, resetStudio, setActiveTab } = useApp();
+  const { studio, setStudioScene, setStudioLighting, navigate, resetStudio, setActiveTab } = useApp();
   const [exitOpen, setExitOpen] = useState(false);
   const [customOpen, setCustomOpen] = useState(false);
 
@@ -69,6 +70,45 @@ export function StudioSceneScreen() {
             size="md"
           />
         ))}
+      </div>
+
+      {/* Lighting presets */}
+      <div className="px-5 mt-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Sun className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
+          <p className="text-[14px] font-medium">Lighting</p>
+        </div>
+        <p className="text-[12px] text-muted-foreground mb-3">
+          How should it be lit?
+        </p>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
+          {LIGHTING_PRESETS.map((l) => {
+            const active = studio.lighting === l.id;
+            return (
+              <button
+                key={l.id}
+                onClick={() => setStudioLighting(l.id as LightingOption)}
+                className={cn(
+                  "shrink-0 flex flex-col items-start rounded-2xl p-3 w-28 transition-all duration-200 active:scale-95",
+                  active
+                    ? "bg-foreground text-background shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)]"
+                    : "bg-secondary text-foreground hover:bg-accent",
+                )}
+                aria-pressed={active}
+              >
+                <span className="text-[13px] font-semibold">{l.label}</span>
+                <span
+                  className={cn(
+                    "text-[11px] mt-1 line-clamp-2",
+                    active ? "opacity-70" : "text-muted-foreground",
+                  )}
+                >
+                  {l.description}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="px-5 mt-4">

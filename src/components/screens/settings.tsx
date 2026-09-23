@@ -8,12 +8,14 @@ import { PrimaryCTA } from "@/components/studio/cta";
 import {
   MODEL_PRESETS,
   POSE_PRESETS,
+  LIGHTING_PRESETS,
   SCENE_PRESETS,
   STYLE_PRESETS,
 } from "@/lib/presets";
 import type {
   ModelOption,
   PoseOption,
+  LightingOption,
   SceneOption,
   StyleOption,
 } from "@/lib/types";
@@ -182,6 +184,24 @@ export function SettingsScreen() {
                   active={settings.defaultPose === p.id}
                   onClick={() =>
                     setSettings({ defaultPose: p.id as PoseOption })
+                  }
+                />
+              ))}
+            </div>
+          </SettingGroup>
+
+          <SettingGroup
+            label="Default lighting"
+            description="The light quality for new studios."
+          >
+            <div className="grid grid-cols-3 gap-2">
+              {LIGHTING_PRESETS.map((l) => (
+                <PresetChip
+                  key={l.id}
+                  label={l.label}
+                  active={settings.defaultLighting === l.id}
+                  onClick={() =>
+                    setSettings({ defaultLighting: l.id as LightingOption })
                   }
                 />
               ))}

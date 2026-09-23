@@ -36,6 +36,7 @@ export type ScreenId =
 export type ModelOption = "none" | "woman" | "man" | "custom";
 export type ModelPreference = "natural" | "elegant" | "editorial";
 export type PoseOption = "standing" | "walking" | "seated" | "detail" | "dynamic";
+export type LightingOption = "soft" | "hard" | "dramatic" | "natural" | "golden";
 export type SceneOption = "studio" | "street" | "lifestyle" | "editorial";
 export type StyleOption =
   | "clean"

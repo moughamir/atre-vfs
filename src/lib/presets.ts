@@ -75,6 +75,48 @@ export interface ScenePreset {
   previewPrompt: string;
 }
 
+// ── Lighting presets ────────────────────────────────────────────
+export interface LightingPreset {
+  id: LightingOption;
+  label: string;
+  description: string;
+  promptHint: string;
+}
+
+export const LIGHTING_PRESETS: LightingPreset[] = [
+  {
+    id: "soft",
+    label: "Soft",
+    description: "Diffused, gentle, flattering",
+    promptHint: "soft diffused lighting, gentle shadows, flattering wrap-around light, even illumination",
+  },
+  {
+    id: "hard",
+    label: "Hard",
+    description: "Crisp, directional, defined shadows",
+    promptHint: "hard directional lighting, crisp defined shadows, high contrast, sharp light source",
+  },
+  {
+    id: "dramatic",
+    label: "Dramatic",
+    description: "Moody, high-contrast, cinematic",
+    promptHint: "dramatic chiaroscuro lighting, deep shadows with bright highlights, cinematic mood, high contrast",
+  },
+  {
+    id: "natural",
+    label: "Natural",
+    description: "Daylight, organic, realistic",
+    promptHint: "natural daylight, soft window light, organic realistic illumination, true-to-life tones",
+  },
+  {
+    id: "golden",
+    label: "Golden",
+    description: "Warm, golden hour glow",
+    promptHint: "golden hour lighting, warm sunset glow, soft amber tones, backlit rim light",
+  },
+];
+
+
 export const SCENE_PRESETS: ScenePreset[] = [
   {
     id: "studio",

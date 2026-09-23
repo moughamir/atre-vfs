@@ -477,3 +477,58 @@ Stage Summary:
 - Default pose configurable in Settings ✓
 - Total screens: 29 (unchanged — pose is a new section within Studio Model, not a new screen)
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-9
+Agent: Z.ai Code (webDevReview cron)
+Task: Lighting presets in Studio Scene + generation API prompt integration + Settings default lighting
+
+Work Log:
+- Reviewed worklog.md — CRON-8 completed Pose presets in Studio Model
+- Ran agent-browser QA on Home/Products/Shop/More/Lookbook/Activity — all rendering, no console errors
+- Added Lighting presets (new dimension of control):
+  - Added LightingOption type: "soft" | "hard" | "dramatic" | "natural" | "golden"
+  - Created LIGHTING_PRESETS array with 5 presets, each with label/description/promptHint:
+    - Soft: diffused, gentle, flattering
+    - Hard: crisp, directional, defined shadows
+    - Dramatic: moody, high-contrast, cinematic
+    - Natural: daylight, organic, realistic
+    - Golden: warm, golden hour glow
+  - Added lighting to studio state in Zustand store (initial: "soft")
+  - Added setStudioLighting action
+  - Added defaultLighting to UserSettings (default: "soft")
+  - Wired startStudio to apply settings.defaultLighting
+- Updated Studio Scene screen with Lighting section:
+  - Horizontal scroll of 5 lighting cards with Sun icon header
+  - Each card: label + description, active state with shadow elevation
+  - Positioned between scene grid and "Create custom scene" button
+  - Same visual language as the Pose section in Studio Model
+- Updated generation API (/api/studio/generate):
+  - Added lighting parameter to GenerateBody interface
+  - Added LIGHTING_PRESETS import
+  - Integrated lighting.promptHint into the fashion prompt (between style and angle)
+  - Removed redundant "professional studio lighting" from the quality suffix (lighting is now explicit)
+- Updated Generating screen to pass studio.lighting to the API
+- Added Default lighting section to Settings screen:
+  - 3-column grid of 5 lighting chips in the Defaults tab
+  - Active state with ring + check
+  - Positioned after Default pose
+
+Verification Results:
+- Scene screen: all 5 lighting presets visible (Soft/Hard/Dramatic/Natural/Golden) ✓
+- Lighting cards show label + description (e.g. "Soft Diffused, gentle, flattering") ✓
+- Scene presets still render (Studio/Street/Lifestyle/Editorial) ✓
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+- No console errors ✓
+- Store: lighting in studio state + setStudioLighting + defaultLighting in settings ✓
+- Generation API: lighting parameter integrated into prompt ✓
+- Dev server running on port 3000 (HTTP 200), 1 project + 1 favorite persisted
+
+Stage Summary:
+- Lighting presets added to Studio Scene step — 5 options (Soft/Hard/Dramatic/Natural/Golden) ✓
+- Lighting is integrated into the AI generation prompt via promptHint ✓
+- Default lighting configurable in Settings ✓
+- Studio now has 6 creative dimensions: Model, Pose, Model preference, Scene, Lighting, Style
+- Total screens: 29 (unchanged — lighting is a new section within Studio Scene)
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

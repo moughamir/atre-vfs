@@ -60,6 +60,7 @@ export function GeneratingScreen() {
             modelPreference: studio.modelPreference,
             pose: studio.pose,
             scene: studio.scene,
+            lighting: studio.lighting,
             style: studio.style,
             count: settings.generationCount,
           }),

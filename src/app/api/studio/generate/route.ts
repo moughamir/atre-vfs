@@ -6,10 +6,11 @@ import crypto from "crypto";
 import {
   MODEL_PRESETS,
   POSE_PRESETS,
+  LIGHTING_PRESETS,
   SCENE_PRESETS,
   STYLE_PRESETS,
 } from "@/lib/presets";
-import type { ModelOption, PoseOption, SceneOption, StyleOption } from "@/lib/types";
+import type { ModelOption, PoseOption, LightingOption, SceneOption, StyleOption } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 180;
@@ -22,6 +23,7 @@ interface GenerateBody {
   modelPreference?: string | null;
   pose?: PoseOption;
   scene: SceneOption;
+  lighting?: LightingOption;
   style: StyleOption;
   count?: number;
 }
@@ -31,6 +33,7 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
   const scene = SCENE_PRESETS.find((s) => s.id === b.scene);
   const style = STYLE_PRESETS.find((s) => s.id === b.style);
   const pose = POSE_PRESETS.find((p) => p.id === b.pose) ?? POSE_PRESETS[0];
+  const lighting = LIGHTING_PRESETS.find((l) => l.id === b.lighting) ?? LIGHTING_PRESETS[0];
 
   const modelPart =
     b.model === "none"
@@ -69,9 +72,10 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
     `set in a ${scene?.label.toLowerCase() ?? "studio"} environment`,
     scene?.previewPrompt,
     style?.previewPrompt,
+    lighting?.promptHint,
     angle,
     "preserving the exact identity, color, shape, fabric and details of the product",
-    "sharp focus on the garment, professional studio lighting, premium magazine quality, photorealistic, 4k, depth of field",
+    "sharp focus on the garment, premium magazine quality, photorealistic, 4k, depth of field",
     "no text, no watermark, no logos, no distorted anatomy",
   ]
     .filter(Boolean)
