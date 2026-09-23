@@ -6,7 +6,7 @@ import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
 import { PrimaryCTA, SecondaryCTA } from "@/components/studio/cta";
 import { SmartImage } from "@/components/studio/smart-image";
-import { RefreshCw, Check, Heart, Layers, ChevronRight } from "lucide-react";
+import { RefreshCw, Check, Heart, Layers, ChevronRight, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ResultsScreen() {
@@ -237,7 +237,7 @@ export function ResultsScreen() {
       </div>
 
       {/* Select all */}
-      <div className="px-5 mt-4">
+      <div className="px-5 mt-4 flex items-center gap-2">
         <button
           onClick={toggleSelectAll}
           className={cn(
@@ -257,6 +257,34 @@ export function ResultsScreen() {
           </span>
           {allSelected ? "All selected" : "Select all"}
         </button>
+        {selectedCount > 0 && (
+          <button
+            onClick={() => {
+              const selected = images.filter((i) => i.selected);
+              selected.forEach((img, i) => {
+                setTimeout(() => {
+                  const a = document.createElement("a");
+                  a.href = img.url;
+                  a.download = `atre-${studio.product?.name?.toLowerCase().replace(/\s+/g, "-") ?? "image"}-${i + 1}.png`;
+                  a.target = "_blank";
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                }, i * 300);
+              });
+              pushToast({
+                title: `Downloading ${selectedCount} image${selectedCount === 1 ? "" : "s"}`,
+                variant: "success",
+              });
+            }}
+            className="flex items-center gap-2 h-10 px-4 rounded-full text-[13px] font-medium bg-secondary text-foreground transition active:scale-95 hover:bg-accent"
+            aria-label="Download selected"
+          >
+            <Download className="h-4 w-4" strokeWidth={1.75} />
+            <span className="hidden sm:inline">Download</span>
+            <span className="sm:hidden">{selectedCount}</span>
+          </button>
+        )}
       </div>
 
       <div className="flex-1" />

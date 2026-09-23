@@ -28,6 +28,7 @@ import { ProjectDetailScreen } from "@/components/screens/project-detail";
 import { FavoritesScreen } from "@/components/screens/favorites";
 import { SettingsScreen } from "@/components/screens/settings";
 import { OnboardingScreen } from "@/components/screens/onboarding";
+import { LookbookScreen } from "@/components/screens/lookbook";
 
 import { Loader2 } from "lucide-react";
 
@@ -123,6 +124,8 @@ export default function Home() {
         return <SettingsScreen />;
       case "onboarding":
         return <OnboardingScreen />;
+      case "lookbook":
+        return <LookbookScreen />;
       default:
         return <HomeScreen />;
     }

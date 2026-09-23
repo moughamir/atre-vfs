@@ -272,3 +272,53 @@ Stage Summary:
 - Settings now drive the studio flow: startStudio applies defaultModel/Scene/Style, Generating respects generationCount ✓
 - Total screens: 24 (was 21) — added Settings, Onboarding, (Lookbook placeholder in types)
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-5
+Agent: Z.ai Code (webDevReview cron)
+Task: Lookbook screen + more style presets + batch download + Home 3-column layout
+
+Work Log:
+- Reviewed worklog.md — CRON-4 completed Settings, Onboarding, Home stats strip, settings-driven defaults
+- Ran agent-browser QA on Home/Products/Shop/More/Studio — all rendering, no console errors
+- Built Lookbook screen (`/components/screens/lookbook.tsx`):
+  - Aggregates ALL generated images across ALL projects into one masonry-style gallery
+  - Two-column grid with varying aspect ratios (3/4, 4/5) for editorial masonry feel
+  - Filter chips: "All" + per-project filter (only shows when >1 project)
+  - Each image card: SmartImage with hover caption (product name + style/scene), favorite badge
+  - Image detail sheet (bottom sheet): full image + metadata + 3 actions (Download/Share/Open studio)
+  - Empty state with "Create Studio" CTA
+  - Header shows total image count + project count
+- Expanded style presets (V1.1 roadmap item):
+  - Added "Noir" style: cinematic, moody, high-contrast, film-noir atmosphere
+  - Added "Pastel" style: soft, dreamy, romantic, ethereal mood
+  - Updated StyleOption type + STYLE_PRESETS array (now 8 styles: Clean/Luxury/Summer/Editorial/Urban/Minimal/Noir/Pastel)
+- Added batch download to Results screen:
+  - "Download" button appears next to "Select all" when images are selected
+  - Downloads all selected images sequentially (300ms delay between each)
+  - Filenames: atre-{product-name}-{n}.png
+  - Toast confirmation: "Downloading N images"
+- Redesigned Home quick-access tiles:
+  - Changed from 2-column (Projects/Favorites) to 3-column (Projects/Lookbook/Favorites)
+  - More compact tile design: icon badge + display-font label + count
+  - Lookbook tile shows total image count across all projects
+  - Projects tile shows pulsing dot when in-progress projects exist
+- Wired Lookbook into page.tsx routing + types ScreenId + goBack tabMap
+
+Verification Results:
+- Home: 3 quick-access tiles render (Projects, Lookbook, Favorites) with counts ✓
+- Lookbook screen: "Lookbook" heading + 4 images from persisted project ✓
+- Lookbook images: "View White Linen Shirt image 1-4" buttons present ✓
+- Style presets: 8 styles now in STYLE_PRESETS (added Noir, Pastel) ✓
+- Batch download: button appears when images selected, downloads sequentially ✓
+- No console errors ✓
+- Lint: 0 errors, 21 warnings (unused eslint-disable directives) ✓
+
+Stage Summary:
+- Lookbook screen — curated masonry gallery of all generated images, filterable by project, with detail sheet ✓
+- 2 new style presets (Noir, Pastel) — V1.1 roadmap item, total 8 styles ✓
+- Batch download in Results — download all selected images with one tap ✓
+- Home redesigned with 3-column quick access (Projects/Lookbook/Favorites) ✓
+- Total screens: 25 (was 24) — added Lookbook
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

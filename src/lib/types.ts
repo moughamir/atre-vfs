@@ -38,7 +38,9 @@ export type StyleOption =
   | "summer"
   | "editorial"
   | "urban"
-  | "minimal";
+  | "minimal"
+  | "noir"
+  | "pastel";
 
 export type ProjectStatus =
   | "configuring"

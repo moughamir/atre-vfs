@@ -116,6 +116,20 @@ export const STYLE_PRESETS: StylePreset[] = [
     previewPrompt:
       "minimal fashion photography, monochrome palette, stripped back composition, soft natural light, quiet and refined aesthetic",
   },
+  {
+    id: "noir",
+    label: "Noir",
+    description: "Cinematic, moody, high-contrast",
+    previewPrompt:
+      "cinematic noir fashion photography, dramatic high-contrast lighting, deep blacks with rim light, moody film-noir atmosphere, sophisticated and timeless",
+  },
+  {
+    id: "pastel",
+    label: "Pastel",
+    description: "Soft, dreamy, romantic",
+    previewPrompt:
+      "soft pastel fashion photography, dreamy romantic color palette, gentle diffused light, airy and ethereal mood, delicate and refined",
+  },
 ];
 
 // ── Product categories ──────────────────────────────────────────

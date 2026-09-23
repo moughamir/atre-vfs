@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
 import { getGreeting, formatPrice } from "@/lib/presets";
-import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock, ShoppingBag } from "lucide-react";
+import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock, ShoppingBag, Images } from "lucide-react";
 import type { Product, Listing, ProjectSummary, FavoriteImage } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchProjects, fetchFavorites } from "@/lib/api";
@@ -51,6 +51,10 @@ export function HomeScreen() {
   const recent = products.slice(0, 6);
   const inProgress = projects.filter(
     (p) => p.status === "configuring" || p.status === "generating" || p.status === "failed",
+  );
+  const totalImages = projects.reduce(
+    (sum, p) => sum + p.generations.reduce((s, g) => s + g.images.length, 0),
+    0,
   );
 
   const onStartStudio = () => {
@@ -144,40 +148,53 @@ export function HomeScreen() {
       )}
 
       {/* Quick access tiles */}
-      <div className="mt-5 px-5 grid grid-cols-2 gap-3">
+      <div className="mt-5 px-5 grid grid-cols-3 gap-2.5">
         <button
           onClick={() => navigate("projects")}
-          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-4 text-left active:scale-[0.98] transition hover:bg-secondary"
+          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-3 text-left active:scale-[0.98] transition hover:bg-secondary"
           aria-label="View all projects"
         >
-          <div className="flex items-center justify-between">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
+          <div className="flex items-center justify-between mb-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background">
               <Layers className="h-4 w-4" strokeWidth={1.75} />
             </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            {inProgress.length > 0 && (
+              <span className="flex h-2 w-2 rounded-full bg-foreground animate-pulse" />
+            )}
           </div>
-          <p className="font-display text-[18px] mt-3">Projects</p>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
-            {projects.length} studio{projects.length === 1 ? "" : "s"}
+          <p className="font-display text-[16px] leading-tight">Projects</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {projects.length}
           </p>
-          {inProgress.length > 0 && (
-            <span className="absolute top-3 right-3 flex h-2 w-2 rounded-full bg-foreground animate-pulse" />
-          )}
+        </button>
+        <button
+          onClick={() => navigate("lookbook")}
+          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-3 text-left active:scale-[0.98] transition hover:bg-secondary"
+          aria-label="View lookbook"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background">
+              <Images className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+          </div>
+          <p className="font-display text-[16px] leading-tight">Lookbook</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {totalImages > 0 ? `${totalImages} images` : "Gallery"}
+          </p>
         </button>
         <button
           onClick={() => navigate("favorites")}
-          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-4 text-left active:scale-[0.98] transition hover:bg-secondary"
+          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-3 text-left active:scale-[0.98] transition hover:bg-secondary"
           aria-label="View favorites"
         >
-          <div className="flex items-center justify-between">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
+          <div className="flex items-center justify-between mb-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background">
               <Heart className="h-4 w-4" strokeWidth={1.75} />
             </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="font-display text-[18px] mt-3">Favorites</p>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
-            {favorites.length} saved
+          <p className="font-display text-[16px] leading-tight">Favorites</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {favorites.length}
           </p>
         </button>
       </div>
