@@ -7,10 +7,11 @@ import {
   MODEL_PRESETS,
   POSE_PRESETS,
   LIGHTING_PRESETS,
+  CAMERA_ANGLE_PRESETS,
   SCENE_PRESETS,
   STYLE_PRESETS,
 } from "@/lib/presets";
-import type { ModelOption, PoseOption, LightingOption, SceneOption, StyleOption } from "@/lib/types";
+import type { ModelOption, PoseOption, LightingOption, CameraAngleOption, SceneOption, StyleOption } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 180;
@@ -24,6 +25,7 @@ interface GenerateBody {
   pose?: PoseOption;
   scene: SceneOption;
   lighting?: LightingOption;
+  cameraAngle?: CameraAngleOption;
   style: StyleOption;
   count?: number;
 }
@@ -34,6 +36,7 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
   const style = STYLE_PRESETS.find((s) => s.id === b.style);
   const pose = POSE_PRESETS.find((p) => p.id === b.pose) ?? POSE_PRESETS[0];
   const lighting = LIGHTING_PRESETS.find((l) => l.id === b.lighting) ?? LIGHTING_PRESETS[0];
+  const cameraAngle = CAMERA_ANGLE_PRESETS.find((a) => a.id === b.cameraAngle) ?? CAMERA_ANGLE_PRESETS[0];
 
   const modelPart =
     b.model === "none"
@@ -53,14 +56,14 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
       ? b.productName
       : "the featured fashion product";
 
-  // Variation angles
-  const angles = [
-    "front-facing composition",
-    "three-quarter angle composition",
-    "side profile composition",
-    "dynamic editorial angle",
+  // Subtle variation for multi-image generations
+  const variations = [
+    "subtly different framing",
+    "slight pose variation",
+    "alternative angle emphasis",
+    "different moment captured",
   ];
-  const angle = angles[variant % angles.length];
+  const variation = variations[variant % variations.length];
 
   return [
     `High-end fashion editorial photograph of ${product}`,
@@ -69,11 +72,12 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
       : "",
     modelPart + prefPart,
     pose?.promptHint,
+    cameraAngle?.promptHint,
     `set in a ${scene?.label.toLowerCase() ?? "studio"} environment`,
     scene?.previewPrompt,
     style?.previewPrompt,
     lighting?.promptHint,
-    angle,
+    variation,
     "preserving the exact identity, color, shape, fabric and details of the product",
     "sharp focus on the garment, premium magazine quality, photorealistic, 4k, depth of field",
     "no text, no watermark, no logos, no distorted anatomy",

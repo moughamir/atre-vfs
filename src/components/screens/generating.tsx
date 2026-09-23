@@ -61,6 +61,7 @@ export function GeneratingScreen() {
             pose: studio.pose,
             scene: studio.scene,
             lighting: studio.lighting,
+            cameraAngle: studio.cameraAngle,
             style: studio.style,
             count: settings.generationCount,
           }),

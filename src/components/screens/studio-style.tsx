@@ -6,13 +6,14 @@ import { ScreenHeader, ExitStudioConfirm } from "@/components/studio/screen-head
 import { PrimaryCTA } from "@/components/studio/cta";
 import { StudioProgress } from "@/components/studio/studio-progress";
 import { ChoiceCard } from "@/components/studio/choice-card";
-import { STYLE_PRESETS } from "@/lib/presets";
-import { Sparkles } from "lucide-react";
+import { STYLE_PRESETS, CAMERA_ANGLE_PRESETS } from "@/lib/presets";
+import { Sparkles, Camera } from "lucide-react";
 import { useState } from "react";
-import type { StyleOption } from "@/lib/types";
+import type { StyleOption, CameraAngleOption } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export function StudioStyleScreen() {
-  const { studio, setStudioStyle, navigate, resetStudio, setActiveTab } = useApp();
+  const { studio, setStudioStyle, setStudioCameraAngle, navigate, resetStudio, setActiveTab } = useApp();
   const [exitOpen, setExitOpen] = useState(false);
 
   const onExitConfirm = () => {
@@ -63,6 +64,45 @@ export function StudioStyleScreen() {
             size="md"
           />
         ))}
+      </div>
+
+      {/* Camera angle presets */}
+      <div className="px-5 mt-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Camera className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
+          <p className="text-[14px] font-medium">Camera angle</p>
+        </div>
+        <p className="text-[12px] text-muted-foreground mb-3">
+          From which perspective?
+        </p>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
+          {CAMERA_ANGLE_PRESETS.map((a) => {
+            const active = studio.cameraAngle === a.id;
+            return (
+              <button
+                key={a.id}
+                onClick={() => setStudioCameraAngle(a.id as CameraAngleOption)}
+                className={cn(
+                  "shrink-0 flex flex-col items-start rounded-2xl p-3 w-28 transition-all duration-200 active:scale-95",
+                  active
+                    ? "bg-foreground text-background shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)]"
+                    : "bg-secondary text-foreground hover:bg-accent",
+                )}
+                aria-pressed={active}
+              >
+                <span className="text-[13px] font-semibold">{a.label}</span>
+                <span
+                  className={cn(
+                    "text-[11px] mt-1 line-clamp-2",
+                    active ? "opacity-70" : "text-muted-foreground",
+                  )}
+                >
+                  {a.description}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex-1" />

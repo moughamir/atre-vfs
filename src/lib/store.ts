@@ -9,6 +9,7 @@ import type {
   ModelPreference,
   PoseOption,
   LightingOption,
+  CameraAngleOption,
   SceneOption,
   StyleOption,
   GeneratedImage,
@@ -31,6 +32,7 @@ export interface UserSettings {
   defaultStyle: StyleOption;
   defaultPose: PoseOption;
   defaultLighting: LightingOption;
+  defaultCameraAngle: CameraAngleOption;
   generationCount: number; // 1..4
   hasOnboarded: boolean;
 }
@@ -41,6 +43,7 @@ const defaultSettings: UserSettings = {
   defaultStyle: "clean",
   defaultPose: "standing",
   defaultLighting: "soft",
+  defaultCameraAngle: "front",
   generationCount: 4,
   hasOnboarded: false,
 };
@@ -89,6 +92,7 @@ interface AppState {
     pose: PoseOption;
     scene: SceneOption;
     lighting: LightingOption;
+    cameraAngle: CameraAngleOption;
     style: StyleOption;
     status: ProjectStatus;
     currentImages: GeneratedImage[];
@@ -132,6 +136,7 @@ interface AppState {
   setStudioPose: (p: PoseOption) => void;
   setStudioScene: (s: SceneOption) => void;
   setStudioLighting: (l: LightingOption) => void;
+  setStudioCameraAngle: (a: CameraAngleOption) => void;
   setStudioStyle: (s: StyleOption) => void;
   setStudioStatus: (s: ProjectStatus) => void;
   setStudioImages: (imgs: GeneratedImage[]) => void;
@@ -174,6 +179,7 @@ const initialStudio = {
   pose: "standing" as PoseOption,
   scene: "studio" as SceneOption,
   lighting: "soft" as LightingOption,
+  cameraAngle: "front" as CameraAngleOption,
   style: "clean" as StyleOption,
   status: "configuring" as ProjectStatus,
   currentImages: [] as GeneratedImage[],
@@ -303,6 +309,7 @@ export const useApp = create<AppState>((set, get) => ({
         pose: s.defaultPose,
         scene: s.defaultScene,
         lighting: s.defaultLighting,
+        cameraAngle: s.defaultCameraAngle,
         style: s.defaultStyle,
         status: "configuring",
       },
@@ -321,6 +328,7 @@ export const useApp = create<AppState>((set, get) => ({
   setStudioPose: (p) => set((s) => ({ studio: { ...s.studio, pose: p } })),
   setStudioScene: (sc) => set((s) => ({ studio: { ...s.studio, scene: sc } })),
   setStudioLighting: (l) => set((s) => ({ studio: { ...s.studio, lighting: l } })),
+  setStudioCameraAngle: (a) => set((s) => ({ studio: { ...s.studio, cameraAngle: a } })),
   setStudioStyle: (st) => set((s) => ({ studio: { ...s.studio, style: st } })),
   setStudioStatus: (st) => set((s) => ({ studio: { ...s.studio, status: st } })),
   setStudioImages: (imgs) =>

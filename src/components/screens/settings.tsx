@@ -9,6 +9,7 @@ import {
   MODEL_PRESETS,
   POSE_PRESETS,
   LIGHTING_PRESETS,
+  CAMERA_ANGLE_PRESETS,
   SCENE_PRESETS,
   STYLE_PRESETS,
 } from "@/lib/presets";
@@ -16,6 +17,7 @@ import type {
   ModelOption,
   PoseOption,
   LightingOption,
+  CameraAngleOption,
   SceneOption,
   StyleOption,
 } from "@/lib/types";
@@ -202,6 +204,24 @@ export function SettingsScreen() {
                   active={settings.defaultLighting === l.id}
                   onClick={() =>
                     setSettings({ defaultLighting: l.id as LightingOption })
+                  }
+                />
+              ))}
+            </div>
+          </SettingGroup>
+
+          <SettingGroup
+            label="Default camera angle"
+            description="The perspective for new studios."
+          >
+            <div className="grid grid-cols-3 gap-2">
+              {CAMERA_ANGLE_PRESETS.map((a) => (
+                <PresetChip
+                  key={a.id}
+                  label={a.label}
+                  active={settings.defaultCameraAngle === a.id}
+                  onClick={() =>
+                    setSettings({ defaultCameraAngle: a.id as CameraAngleOption })
                   }
                 />
               ))}

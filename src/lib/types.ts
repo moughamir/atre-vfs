@@ -37,6 +37,7 @@ export type ModelOption = "none" | "woman" | "man" | "custom";
 export type ModelPreference = "natural" | "elegant" | "editorial";
 export type PoseOption = "standing" | "walking" | "seated" | "detail" | "dynamic";
 export type LightingOption = "soft" | "hard" | "dramatic" | "natural" | "golden";
+export type CameraAngleOption = "front" | "three-quarter" | "side" | "back" | "aerial" | "closeup";
 export type SceneOption = "studio" | "street" | "lifestyle" | "editorial";
 export type StyleOption =
   | "clean"

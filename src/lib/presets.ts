@@ -67,6 +67,53 @@ export const POSE_PRESETS: PosePreset[] = [
   },
 ];
 
+// ── Camera angle presets ───────────────────────────────────────
+export interface CameraAnglePreset {
+  id: CameraAngleOption;
+  label: string;
+  description: string;
+  promptHint: string;
+}
+
+export const CAMERA_ANGLE_PRESETS: CameraAnglePreset[] = [
+  {
+    id: "front",
+    label: "Front",
+    description: "Direct, symmetrical, catalog",
+    promptHint: "front-facing camera angle, symmetrical composition, direct catalog view",
+  },
+  {
+    id: "three-quarter",
+    label: "3/4 Angle",
+    description: "Editorial, dynamic depth",
+    promptHint: "three-quarter camera angle, slight rotation, editorial depth and dimension",
+  },
+  {
+    id: "side",
+    label: "Side",
+    description: "Profile, sculptural",
+    promptHint: "side profile camera angle, sculptural silhouette, full profile view",
+  },
+  {
+    id: "back",
+    label: "Back",
+    description: "Rear view, detail-focused",
+    promptHint: "back view camera angle, rear detail focus, showcasing back design",
+  },
+  {
+    id: "aerial",
+    label: "Aerial",
+    description: "Top-down, modern",
+    promptHint: "aerial top-down camera angle, bird's eye view, modern flatlay perspective",
+  },
+  {
+    id: "closeup",
+    label: "Close-up",
+    description: "Macro, texture-focused",
+    promptHint: "extreme close-up camera angle, macro detail, focus on fabric texture and stitching",
+  },
+];
+
 // ── Scene presets ──────────────────────────────────────────────
 export interface ScenePreset {
   id: SceneOption;

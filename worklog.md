@@ -532,3 +532,61 @@ Stage Summary:
 - Studio now has 6 creative dimensions: Model, Pose, Model preference, Scene, Lighting, Style
 - Total screens: 29 (unchanged — lighting is a new section within Studio Scene)
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-10
+Agent: Z.ai Code (webDevReview cron)
+Task: Camera Angle presets in Studio Style + generation API prompt integration + Settings default camera angle
+
+Work Log:
+- Reviewed worklog.md — CRON-9 completed Lighting presets in Studio Scene
+- Ran agent-browser QA on Home/Products/Shop/More — all rendering, no console errors
+- Added Camera Angle presets (7th creative dimension):
+  - Added CameraAngleOption type: "front" | "three-quarter" | "side" | "back" | "aerial" | "closeup"
+  - Created CAMERA_ANGLE_PRESETS array with 6 presets, each with label/description/promptHint:
+    - Front: direct, symmetrical, catalog
+    - 3/4 Angle: editorial, dynamic depth
+    - Side: profile, sculptural
+    - Back: rear view, detail-focused
+    - Aerial: top-down, modern
+    - Close-up: macro, texture-focused
+  - Added cameraAngle to studio state in Zustand store (initial: "front")
+  - Added setStudioCameraAngle action
+  - Added defaultCameraAngle to UserSettings (default: "front")
+  - Wired startStudio to apply settings.defaultCameraAngle
+- Updated Studio Style screen with Camera Angle section:
+  - Horizontal scroll of 6 camera angle cards with Camera icon header
+  - Each card: label + description, active state with shadow elevation
+  - Positioned between style grid and CREATE IMAGES CTA
+  - Same visual language as Pose (Model) and Lighting (Scene) sections
+- Updated generation API (/api/studio/generate):
+  - Added cameraAngle parameter to GenerateBody interface
+  - Added CAMERA_ANGLE_PRESETS import
+  - Replaced the old hardcoded "angles" variation array with cameraAngle.promptHint
+  - Changed variation prompts from angle-based to subtle framing/pose/moment variations
+  - Camera angle is now an explicit, user-controlled dimension (was auto-varied before)
+- Updated Generating screen to pass studio.cameraAngle to the API
+- Added Default camera angle section to Settings screen:
+  - 3-column grid of 6 camera angle chips in the Defaults tab
+  - Active state with ring + check
+  - Positioned after Default lighting
+
+Verification Results:
+- Style screen: all 6 camera angle presets visible (Front/3/4 Angle/Side/Back/Aerial/Close-up) ✓
+- Camera angle cards show label + description (e.g. "Front Direct, symmetrical, catalog") ✓
+- Style presets still render (8 styles: Clean/Luxury/Summer/Editorial/Urban/Minimal/Noir/Pastel) ✓
+- Full flow verified: Home → Studio → product → Model → Scene → Style (with Camera Angle section) ✓
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+- No console errors ✓
+- Store: cameraAngle in studio state + setStudioCameraAngle + defaultCameraAngle in settings ✓
+- Generation API: cameraAngle parameter integrated into prompt ✓
+- Dev server running on port 3000 (HTTP 200), 1 project + 1 favorite persisted
+
+Stage Summary:
+- Camera Angle presets added to Studio Style step — 6 options (Front/3-quarter/Side/Back/Aerial/Close-up) ✓
+- Camera angle is integrated into the AI generation prompt via promptHint ✓
+- Default camera angle configurable in Settings ✓
+- Studio now has 7 creative dimensions: Model, Pose, Preference, Scene, Lighting, Camera Angle, Style
+- Total screens: 29 (unchanged — camera angle is a new section within Studio Style)
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
