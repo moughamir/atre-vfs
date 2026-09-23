@@ -590,3 +590,47 @@ Stage Summary:
 - Studio now has 7 creative dimensions: Model, Pose, Preference, Scene, Lighting, Camera Angle, Style
 - Total screens: 29 (unchanged — camera angle is a new section within Studio Style)
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-11
+Agent: Z.ai Code (webDevReview cron)
+Task: Redesign Studio Summary to show all 7 creative dimensions + refined product hero card
+
+Work Log:
+- Reviewed worklog.md — CRON-10 completed Camera Angle presets in Studio Style
+- Ran agent-browser QA on Home/Products/Shop/More/Lookbook/Activity — all rendering, no console errors
+- Redesigned Studio Summary screen (`/components/screens/studio-summary.tsx`):
+  - Previously showed only 3 dimensions (Model, Scene, Style) — now shows ALL 7:
+    1. Model (with model preference as subtext)
+    2. Pose (Standing/Walking/Seated/Detail/Dynamic)
+    3. Scene (Studio/Street/Lifestyle/Editorial)
+    4. Lighting (Soft/Hard/Dramatic/Natural/Golden)
+    5. Camera (Front/3-quarter/Side/Back/Aerial/Close-up)
+    6. Style (Clean/Luxury/Summer/Editorial/Urban/Minimal/Noir/Pastel)
+  - New product hero card: dark gradient card with product thumbnail, name, price+category, edit button
+  - New "Creative direction" section: 2-column grid of 6 DimensionCards
+  - Each DimensionCard: icon badge (User/PersonStanding/Shirt/Sun/Camera/Palette) + label + value + sub + hover edit button
+  - Generation count card: now uses settings.generationCount (was hardcoded "4 images")
+  - Header: "Your studio" with "Ready to create" eyebrow, dynamic count text
+  - Each dimension has an edit button that navigates to the correct studio step
+  - Added POSE_PRESETS, LIGHTING_PRESETS, CAMERA_ANGLE_PRESETS imports
+  - Added STEP_TARGET mapping for all 7 dimensions (pose/preference go to studio-model, lighting goes to studio-scene, angle goes to studio-style)
+
+Verification Results:
+- Summary screen: all 7 dimensions visible with edit buttons (Model/Pose/Scene/Lighting/Camera/Style + Product) ✓
+- Each dimension has "Edit X" button that navigates to correct step ✓
+- Product hero card with thumbnail, name, price ✓
+- Generation count uses settings.generationCount (no longer hardcoded) ✓
+- Full flow verified: Home → Studio → product → Model → Scene → Style → Summary ✓
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+- No console errors ✓
+- Dev server running on port 3000 (HTTP 200), 1 project + 1 favorite persisted
+
+Stage Summary:
+- Studio Summary redesigned — shows all 7 creative dimensions in a 2-column grid with icons ✓
+- Product hero card with dark gradient, thumbnail, and inline edit ✓
+- Generation count now respects settings (was hardcoded) ✓
+- Each dimension card has hover-reveal edit button for quick navigation back ✓
+- Total screens: 29 (unchanged — summary was redesigned, not added)
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
