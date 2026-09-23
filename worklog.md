@@ -421,3 +421,59 @@ Stage Summary:
 - More screen Library section expanded with Activity entry ✓
 - Total screens: 29 (was 27) — added Brand Profile, Activity
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-8
+Agent: Z.ai Code (webDevReview cron)
+Task: Pose presets in Studio Model + generation API prompt integration + Settings default pose
+
+Work Log:
+- Reviewed worklog.md — CRON-7 completed Brand Profile, Activity/Insights, Home Activity banner
+- Ran agent-browser QA on Home/Products/Shop/More/Activity/Brand Profile/Lookbook — all rendering, no console errors
+- Added Pose presets (V1.1 roadmap item):
+  - Added PoseOption type: "standing" | "walking" | "seated" | "detail" | "dynamic"
+  - Created POSE_PRESETS array with 5 poses, each with label/description/promptHint:
+    - Standing: front-facing, classic lookbook
+    - Walking: in motion, editorial energy
+    - Seated: relaxed, intimate framing
+    - Detail: close-up on fabric & fit
+    - Dynamic: bold, angular, high-impact
+  - Added pose to studio state in Zustand store (initial: "standing")
+  - Added setStudioPose action
+  - Added defaultPose to UserSettings (default: "standing")
+  - Wired startStudio to apply settings.defaultPose
+- Updated Studio Model screen with Pose section:
+  - Horizontal scroll of 5 pose cards with PersonStanding icon header
+  - Each card: label + description, active state with shadow elevation
+  - Positioned between model grid and model preferences
+  - Added shadow elevation to active model cards for consistency
+- Updated generation API (/api/studio/generate):
+  - Added pose parameter to GenerateBody interface
+  - Added POSE_PRESETS import
+  - Integrated pose.promptHint into the fashion prompt (between model and scene)
+  - Cleaned up model prompt (removed redundant "full body or three-quarter, refined pose" since pose is now separate)
+- Updated Generating screen to pass studio.pose to the API
+- Added Default pose section to Settings screen:
+  - 3-column grid of 5 pose chips in the Defaults tab
+  - Active state with ring + check
+  - Positioned after Default style
+
+Verification Results:
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+- Pose types defined: PoseOption with 5 values ✓
+- POSE_PRESETS: 5 poses with prompt hints ✓
+- Store: pose in studio state + setStudioPose action + defaultPose in settings ✓
+- Studio Model screen: Pose section with 5 horizontal cards ✓
+- Settings: Default pose section in Defaults tab ✓
+- Generation API: pose parameter integrated into prompt ✓
+- Generating screen: passes pose to API ✓
+- No console errors ✓
+- Dev server running on port 3000 (HTTP 200), 1 project + 1 favorite persisted
+
+Stage Summary:
+- Pose presets added to Studio Model step — 5 poses (Standing/Walking/Seated/Detail/Dynamic) ✓
+- Pose is integrated into the AI generation prompt via promptHint ✓
+- Default pose configurable in Settings ✓
+- Total screens: 29 (unchanged — pose is a new section within Studio Model, not a new screen)
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

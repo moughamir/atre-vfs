@@ -7,6 +7,7 @@ import type {
   Product,
   ModelOption,
   ModelPreference,
+  PoseOption,
   SceneOption,
   StyleOption,
   GeneratedImage,
@@ -27,6 +28,7 @@ export interface UserSettings {
   defaultModel: ModelOption;
   defaultScene: SceneOption;
   defaultStyle: StyleOption;
+  defaultPose: PoseOption;
   generationCount: number; // 1..4
   hasOnboarded: boolean;
 }
@@ -35,6 +37,7 @@ const defaultSettings: UserSettings = {
   defaultModel: "woman",
   defaultScene: "studio",
   defaultStyle: "clean",
+  defaultPose: "standing",
   generationCount: 4,
   hasOnboarded: false,
 };
@@ -80,6 +83,7 @@ interface AppState {
     product: Product | null;
     model: ModelOption;
     modelPreference: ModelPreference | null;
+    pose: PoseOption;
     scene: SceneOption;
     style: StyleOption;
     status: ProjectStatus;
@@ -121,6 +125,7 @@ interface AppState {
   setStudioProjectId: (id: string | null) => void;
   setStudioModel: (m: ModelOption) => void;
   setStudioModelPreference: (p: ModelPreference | null) => void;
+  setStudioPose: (p: PoseOption) => void;
   setStudioScene: (s: SceneOption) => void;
   setStudioStyle: (s: StyleOption) => void;
   setStudioStatus: (s: ProjectStatus) => void;
@@ -161,6 +166,7 @@ const initialStudio = {
   product: null as Product | null,
   model: "woman" as ModelOption,
   modelPreference: null as ModelPreference | null,
+  pose: "standing" as PoseOption,
   scene: "studio" as SceneOption,
   style: "clean" as StyleOption,
   status: "configuring" as ProjectStatus,
@@ -288,6 +294,7 @@ export const useApp = create<AppState>((set, get) => ({
         ...initialStudio,
         product,
         model: s.defaultModel,
+        pose: s.defaultPose,
         scene: s.defaultScene,
         style: s.defaultStyle,
         status: "configuring",
@@ -304,6 +311,7 @@ export const useApp = create<AppState>((set, get) => ({
   setStudioModel: (m) => set((s) => ({ studio: { ...s.studio, model: m } })),
   setStudioModelPreference: (p) =>
     set((s) => ({ studio: { ...s.studio, modelPreference: p } })),
+  setStudioPose: (p) => set((s) => ({ studio: { ...s.studio, pose: p } })),
   setStudioScene: (sc) => set((s) => ({ studio: { ...s.studio, scene: sc } })),
   setStudioStyle: (st) => set((s) => ({ studio: { ...s.studio, style: st } })),
   setStudioStatus: (st) => set((s) => ({ studio: { ...s.studio, status: st } })),

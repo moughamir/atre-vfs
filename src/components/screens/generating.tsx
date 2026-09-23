@@ -58,6 +58,7 @@ export function GeneratingScreen() {
             productDescription: studio.product?.description,
             model: studio.model,
             modelPreference: studio.modelPreference,
+            pose: studio.pose,
             scene: studio.scene,
             style: studio.style,
             count: settings.generationCount,

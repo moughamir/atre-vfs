@@ -7,11 +7,13 @@ import { ScreenHeader } from "@/components/studio/screen-header";
 import { PrimaryCTA } from "@/components/studio/cta";
 import {
   MODEL_PRESETS,
+  POSE_PRESETS,
   SCENE_PRESETS,
   STYLE_PRESETS,
 } from "@/lib/presets";
 import type {
   ModelOption,
+  PoseOption,
   SceneOption,
   StyleOption,
 } from "@/lib/types";
@@ -162,6 +164,24 @@ export function SettingsScreen() {
                   active={settings.defaultStyle === s.id}
                   onClick={() =>
                     setSettings({ defaultStyle: s.id as StyleOption })
+                  }
+                />
+              ))}
+            </div>
+          </SettingGroup>
+
+          <SettingGroup
+            label="Default pose"
+            description="How the model stands in new studios."
+          >
+            <div className="grid grid-cols-3 gap-2">
+              {POSE_PRESETS.map((p) => (
+                <PresetChip
+                  key={p.id}
+                  label={p.label}
+                  active={settings.defaultPose === p.id}
+                  onClick={() =>
+                    setSettings({ defaultPose: p.id as PoseOption })
                   }
                 />
               ))}

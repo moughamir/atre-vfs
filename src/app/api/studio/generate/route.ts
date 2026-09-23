@@ -5,10 +5,11 @@ import path from "path";
 import crypto from "crypto";
 import {
   MODEL_PRESETS,
+  POSE_PRESETS,
   SCENE_PRESETS,
   STYLE_PRESETS,
 } from "@/lib/presets";
-import type { ModelOption, SceneOption, StyleOption } from "@/lib/types";
+import type { ModelOption, PoseOption, SceneOption, StyleOption } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 180;
@@ -19,6 +20,7 @@ interface GenerateBody {
   productImageHint?: string;
   model: ModelOption;
   modelPreference?: string | null;
+  pose?: PoseOption;
   scene: SceneOption;
   style: StyleOption;
   count?: number;
@@ -28,15 +30,16 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
   const model = MODEL_PRESETS.find((m) => m.id === b.model);
   const scene = SCENE_PRESETS.find((s) => s.id === b.scene);
   const style = STYLE_PRESETS.find((s) => s.id === b.style);
+  const pose = POSE_PRESETS.find((p) => p.id === b.pose) ?? POSE_PRESETS[0];
 
   const modelPart =
     b.model === "none"
       ? "presented on an invisible ghost mannequin, product only, no person"
       : b.model === "woman"
-        ? "worn by an elegant female fashion model, full body or three-quarter, refined pose"
+        ? "worn by an elegant female fashion model"
         : b.model === "man"
-          ? "worn by an elegant male fashion model, full body or three-quarter, refined pose"
-          : "worn by a fashion model, refined editorial pose";
+          ? "worn by an elegant male fashion model"
+          : "worn by a fashion model";
 
   const prefPart = b.modelPreference
     ? `, ${b.modelPreference} mood`
@@ -62,6 +65,7 @@ function buildFashionPrompt(b: GenerateBody, variant: number): string {
       ? `(${b.productDescription})`
       : "",
     modelPart + prefPart,
+    pose?.promptHint,
     `set in a ${scene?.label.toLowerCase() ?? "studio"} environment`,
     scene?.previewPrompt,
     style?.previewPrompt,

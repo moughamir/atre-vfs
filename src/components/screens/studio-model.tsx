@@ -5,14 +5,14 @@ import { Screen } from "@/components/studio/screen";
 import { ScreenHeader, ExitStudioConfirm } from "@/components/studio/screen-header";
 import { PrimaryCTA } from "@/components/studio/cta";
 import { StudioProgress } from "@/components/studio/studio-progress";
-import { MODEL_PRESETS, MODEL_PREFERENCES } from "@/lib/presets";
-import { ArrowRight } from "lucide-react";
+import { MODEL_PRESETS, MODEL_PREFERENCES, POSE_PRESETS } from "@/lib/presets";
+import { ArrowRight, PersonStanding } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import type { ModelOption, ModelPreference } from "@/lib/types";
+import type { ModelOption, ModelPreference, PoseOption } from "@/lib/types";
 
 export function StudioModelScreen() {
-  const { studio, setStudioModel, setStudioModelPreference, navigate, resetStudio, setActiveTab } = useApp();
+  const { studio, setStudioModel, setStudioModelPreference, setStudioPose, navigate, resetStudio, setActiveTab } = useApp();
   const [exitOpen, setExitOpen] = useState(false);
 
   const onExitConfirm = () => {
@@ -59,7 +59,7 @@ export function StudioModelScreen() {
               className={cn(
                 "relative overflow-hidden rounded-3xl aspect-[5/6] flex flex-col items-center justify-center p-5 text-center transition-all duration-300 active:scale-[0.97]",
                 active
-                  ? "bg-foreground text-background ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                  ? "bg-foreground text-background ring-2 ring-foreground ring-offset-2 ring-offset-background shadow-[0_12px_32px_-12px_rgba(0,0,0,0.25)]"
                   : "bg-secondary text-foreground ring-1 ring-border hover:ring-foreground/30",
               )}
               aria-pressed={active}
@@ -86,6 +86,45 @@ export function StudioModelScreen() {
             </button>
           );
         })}
+      </div>
+
+      {/* Pose presets */}
+      <div className="px-5 mt-6">
+        <div className="flex items-center gap-2 mb-1">
+          <PersonStanding className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
+          <p className="text-[14px] font-medium">Pose</p>
+        </div>
+        <p className="text-[12px] text-muted-foreground mb-3">
+          How should the model stand?
+        </p>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-1">
+          {POSE_PRESETS.map((p) => {
+            const active = studio.pose === p.id;
+            return (
+              <button
+                key={p.id}
+                onClick={() => setStudioPose(p.id as PoseOption)}
+                className={cn(
+                  "shrink-0 flex flex-col items-start rounded-2xl p-3 w-28 transition-all duration-200 active:scale-95",
+                  active
+                    ? "bg-foreground text-background shadow-[0_8px_20px_-8px_rgba(0,0,0,0.3)]"
+                    : "bg-secondary text-foreground hover:bg-accent",
+                )}
+                aria-pressed={active}
+              >
+                <span className="text-[13px] font-semibold">{p.label}</span>
+                <span
+                  className={cn(
+                    "text-[11px] mt-1 line-clamp-2",
+                    active ? "opacity-70" : "text-muted-foreground",
+                  )}
+                >
+                  {p.description}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Optional model preference */}

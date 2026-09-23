@@ -26,6 +26,47 @@ export const MODEL_PREFERENCES: { id: ModelPreference; label: string }[] = [
   { id: "editorial", label: "Editorial" },
 ];
 
+// ── Pose presets ───────────────────────────────────────────────
+export interface PosePreset {
+  id: PoseOption;
+  label: string;
+  description: string;
+  promptHint: string;
+}
+
+export const POSE_PRESETS: PosePreset[] = [
+  {
+    id: "standing",
+    label: "Standing",
+    description: "Front-facing, classic lookbook",
+    promptHint: "standing pose, front-facing, full body, classic lookbook composition",
+  },
+  {
+    id: "walking",
+    label: "Walking",
+    description: "In motion, editorial energy",
+    promptHint: "mid-stride walking pose, dynamic editorial movement, three-quarter angle",
+  },
+  {
+    id: "seated",
+    label: "Seated",
+    description: "Relaxed, intimate framing",
+    promptHint: "seated pose, relaxed and intimate framing, composed posture",
+  },
+  {
+    id: "detail",
+    label: "Detail",
+    description: "Close-up on fabric & fit",
+    promptHint: "close-up detail shot, focus on fabric texture and garment fit, macro composition",
+  },
+  {
+    id: "dynamic",
+    label: "Dynamic",
+    description: "Bold, angular, high-impact",
+    promptHint: "dynamic angular pose, high-impact editorial composition, bold silhouette",
+  },
+];
+
 // ── Scene presets ──────────────────────────────────────────────
 export interface ScenePreset {
   id: SceneOption;
