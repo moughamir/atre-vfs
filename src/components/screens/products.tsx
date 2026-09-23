@@ -8,6 +8,7 @@ import { PRODUCT_CATEGORIES, formatPrice } from "@/lib/presets";
 import { Plus, Search, Sparkles } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SmartImage } from "@/components/studio/smart-image";
 import { cn } from "@/lib/utils";
 
 export function ProductsScreen() {
@@ -123,23 +124,13 @@ export function ProductsScreen() {
                 }}
                 className="group text-left active:scale-[0.98] transition"
               >
-                <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/5]">
-                  {p.images?.[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.images[0]}
-                      alt={p.name}
-                      loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-active:scale-105"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-foreground/40 text-[11px] uppercase tracking-widest">
-                        No image
-                      </span>
-                    </div>
-                  )}
-                </div>
+                <SmartImage
+                  src={p.images?.[0] ?? ""}
+                  alt={p.name}
+                  rounded="rounded-2xl"
+                  className="aspect-[4/5]"
+                  imgClassName="transition-transform duration-500 group-active:scale-105"
+                />
                 <div className="mt-2">
                   <div className="text-[14px] font-medium leading-tight line-clamp-1">
                     {p.name}

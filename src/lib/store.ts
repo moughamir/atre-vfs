@@ -47,6 +47,7 @@ interface AppState {
     status: ProjectStatus;
     currentImages: GeneratedImage[];
     allGenerations: GeneratedImage[][];
+    activeGeneration: number;
     editTarget: "model" | "scene" | "style" | null;
   };
 
@@ -84,6 +85,7 @@ interface AppState {
   setStudioStatus: (s: ProjectStatus) => void;
   setStudioImages: (imgs: GeneratedImage[]) => void;
   addGeneration: (imgs: GeneratedImage[]) => void;
+  setActiveGeneration: (index: number) => void;
   toggleImageSelected: (id: string) => void;
   toggleImageFavorite: (id: string) => void;
   resetStudio: () => void;
@@ -119,6 +121,7 @@ const initialStudio = {
   status: "configuring" as ProjectStatus,
   currentImages: [] as GeneratedImage[],
   allGenerations: [] as GeneratedImage[][],
+  activeGeneration: 0 as number,
   editTarget: null as "model" | "scene" | "style" | null,
 };
 
@@ -256,8 +259,22 @@ export const useApp = create<AppState>((set, get) => ({
         ...s.studio,
         currentImages: imgs,
         allGenerations: [imgs, ...s.studio.allGenerations],
+        activeGeneration: 0,
       },
     })),
+
+  setActiveGeneration: (index) =>
+    set((s) => {
+      const gen = s.studio.allGenerations[index];
+      if (!gen) return s;
+      return {
+        studio: {
+          ...s.studio,
+          currentImages: gen,
+          activeGeneration: index,
+        },
+      };
+    }),
 
   toggleImageSelected: (id) =>
     set((s) => ({

@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/presets";
 import { Share2, Heart, ShoppingBag } from "lucide-react";
 import type { Listing } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SmartImage } from "@/components/studio/smart-image";
 
 export function ShopDetailScreen() {
   const { selectedListingId, pushToast } = useApp();
@@ -80,12 +81,12 @@ export function ShopDetailScreen() {
       ) : (
         <>
           <div className="px-5">
-            <div className="relative overflow-hidden rounded-3xl bg-secondary aspect-[4/5]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative">
+              <SmartImage
                 src={listing.images[activeImg] ?? listing.mainImage}
                 alt={listing.name}
-                className="absolute inset-0 h-full w-full object-cover"
+                rounded="rounded-3xl"
+                className="aspect-[4/5]"
               />
               <div className="absolute top-3 left-3 flex items-center gap-1 bg-background/90 backdrop-blur text-foreground text-[10px] font-medium uppercase tracking-wide px-2.5 py-1 rounded-full">
                 <span className="h-1.5 w-1.5 rounded-full bg-foreground" />

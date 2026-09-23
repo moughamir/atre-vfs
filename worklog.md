@@ -157,3 +157,62 @@ Stage Summary:
 - Visual polish: shadow elevation, sheen animations, refined typography, skeleton loaders, accessibility focus rings
 - All preset ChoiceCards now show real photography instead of gradient fallbacks
 - Dev server running on port 3000 with keep-alive wrapper (HTTP 200)
+
+---
+
+Task ID: CRON-3
+Agent: Z.ai Code (webDevReview cron)
+Task: QA + Edit Image flow + SmartImage everywhere + Shop search/sort + dark mode + generation history
+
+Work Log:
+- Reviewed worklog.md — CRON-2 completed project persistence, favorites, 3 new screens, styling polish
+- Ran agent-browser QA on Home/Products/Shop/More/Projects — all rendering, no console errors (except known Next.js dev overlay)
+- Implemented generation history in Results screen (FR-024 in-context):
+  - Added `activeGeneration` + `setActiveGeneration` to Zustand store
+  - Results screen now shows a horizontal "Generations" strip when multiple generations exist
+  - Each generation thumbnail is clickable to switch the active generation displayed in the grid
+  - Active generation shows ring + check badge; inactive ones dimmed
+  - Header shows "N images · M selected · K generations"
+- Improved Edit Image flow → now feeds back into Results as a new generation (the Generating screen's addGeneration prepends to allGenerations, and the Results history strip lets users switch back)
+- Adopted SmartImage component across all image-heavy screens for skeleton shimmer + fade-in:
+  - Home: product cards + published preview carousel
+  - Products: catalog grid
+  - Results: generated image grid (with selected shadow elevation)
+  - Shop: listing grid
+  - Shop Detail: main gallery image
+  - Project Detail: cover image
+- Added Shop search + sort (new feature):
+  - Search box with clear (X) button, filters by name + description
+  - Sort button opens a chip row: Newest / Price ↑ / Price ↓ / A–Z
+  - Empty search state with "No matches" message
+  - Results count in header
+- Implemented dark mode (new feature):
+  - Created ThemeProvider (next-themes, attribute="class", defaultTheme="light")
+  - Wired into root layout
+  - More screen "Appearance" row: icon toggles Sun/Moon, hint shows "Dark"/"Light", click toggles theme
+  - Persisted via next-themes localStorage
+  - Dark mode verified: document className switches to "dark", VLM rated "OLED-friendly void, elevated dark gray, pure white text, stark white FAB"
+- Restructured More screen:
+  - New "Library" section with "My projects" + "Favorites" shortcuts
+  - "Appearance" row in App section with Sun/Moon icon toggle
+  - Removed nested button (was causing hydration warning) — Appearance is now a flat row button
+- Results screen favorite toggle now syncs to /api/favorites API (persisted) + shows toast
+
+Verification Results:
+- Shop search: typing "cashmere" filters to matching listing, clear button works ✓
+- Shop sort: dropdown opens, options selectable ✓
+- Dark mode: Appearance click toggles className "light" ↔ "dark" ✓
+- More screen: "My projects" + "Favorites" + "Appearance" all present ✓
+- Projects screen: persisted project "White Linen Shirt · Studio · Luxury · 4 images · READY" ✓
+- Lint: 0 errors, 20 warnings (unused eslint-disable directives) ✓
+- VLM dark mode rating: premium OLED aesthetic with proper contrast ✓
+- No console errors (excluding Next.js dev overlay) ✓
+
+Stage Summary:
+- Generation history strip in Results — users can switch between all past generations (FR-024 in-context) ✓
+- SmartImage with skeleton shimmer + fade-in adopted across 6 screens — premium loading polish ✓
+- Shop search + 4 sort options — discoverability feature ✓
+- Dark mode with next-themes persistence — full theme support ✓
+- More screen restructured with Library section + Appearance toggle ✓
+- Edit Image flow now feeds regenerated images back as new generations (visible in history strip) ✓
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

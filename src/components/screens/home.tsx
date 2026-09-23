@@ -9,6 +9,7 @@ import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock } 
 import type { Product, Listing, ProjectSummary, FavoriteImage } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchProjects, fetchFavorites } from "@/lib/api";
+import { SmartImage } from "@/components/studio/smart-image";
 import { cn } from "@/lib/utils";
 
 export function HomeScreen() {
@@ -213,22 +214,14 @@ export function HomeScreen() {
                 }}
                 className="group text-left active:scale-[0.98] transition"
               >
-                <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/5]">
-                  {p.images?.[0] ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.images[0]}
-                      alt={p.name}
-                      loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-active:scale-105"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-foreground/40 text-[11px] uppercase tracking-widest">
-                        No image
-                      </span>
-                    </div>
-                  )}
+                <div className="relative">
+                  <SmartImage
+                    src={p.images?.[0] ?? ""}
+                    alt={p.name}
+                    rounded="rounded-2xl"
+                    className="aspect-[4/5]"
+                    imgClassName="transition-transform duration-500 group-active:scale-105"
+                  />
                   <div className="absolute top-2 right-2">
                     <StatusPill status={p.status} />
                   </div>
@@ -271,14 +264,12 @@ export function HomeScreen() {
                 onClick={() => useApp.getState().openListing(l.id)}
                 className="shrink-0 w-32 text-left active:scale-[0.98] transition"
               >
-                <div className="relative overflow-hidden rounded-2xl bg-secondary aspect-[4/5]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={l.mainImage}
-                    alt={l.name}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                </div>
+                <SmartImage
+                  src={l.mainImage}
+                  alt={l.name}
+                  rounded="rounded-2xl"
+                  className="aspect-[4/5]"
+                />
                 <div className="mt-1.5 text-[13px] font-medium line-clamp-1">{l.name}</div>
                 <div className="text-[11px] text-muted-foreground">
                   {formatPrice(l.price, l.currency)}

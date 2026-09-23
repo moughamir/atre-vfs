@@ -13,10 +13,27 @@ import {
   ChevronRight,
   Sparkles,
   Github,
+  Sun,
+  Moon,
+  Heart,
+  Layers,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export function MoreScreen() {
   const { pushToast, navigate } = useApp();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+
+  const isDark = (resolvedTheme ?? theme) === "dark";
+
+  const toggleTheme = () => {
+    const next = isDark ? "light" : "dark";
+    setTheme(next);
+    pushToast({
+      title: next === "dark" ? "Dark mode on" : "Light mode on",
+      variant: "default",
+    });
+  };
 
   const groups: {
     title: string;
@@ -28,17 +45,36 @@ export function MoreScreen() {
     }[];
   }[] = [
     {
+      title: "Library",
+      items: [
+        {
+          icon: Layers,
+          label: "My projects",
+          onClick: () => navigate("projects"),
+          hint: "All studios",
+        },
+        {
+          icon: Heart,
+          label: "Favorites",
+          onClick: () => navigate("favorites"),
+          hint: "Collection",
+        },
+      ],
+    },
+    {
       title: "Account",
       items: [
         {
           icon: User,
           label: "Brand profile",
-          onClick: () => pushToast({ title: "Coming soon", description: "Brand profile is in the roadmap." }),
+          onClick: () =>
+            pushToast({ title: "Coming soon", description: "Brand profile is in the roadmap." }),
         },
         {
           icon: Users,
           label: "Team",
-          onClick: () => pushToast({ title: "Coming soon", description: "Team invites will land here." }),
+          onClick: () =>
+            pushToast({ title: "Coming soon", description: "Team invites will land here." }),
         },
         {
           icon: CreditCard,
@@ -52,6 +88,12 @@ export function MoreScreen() {
       title: "App",
       items: [
         {
+          icon: isDark ? Sun : Moon,
+          label: "Appearance",
+          onClick: toggleTheme,
+          hint: isDark ? "Dark" : "Light",
+        },
+        {
           icon: Settings,
           label: "Settings",
           onClick: () => pushToast({ title: "Settings coming soon" }),
@@ -64,7 +106,8 @@ export function MoreScreen() {
         {
           icon: MessageSquare,
           label: "Feedback",
-          onClick: () => pushToast({ title: "Thanks — we'll keep improving.", variant: "success" }),
+          onClick: () =>
+            pushToast({ title: "Thanks — we'll keep improving.", variant: "success" }),
         },
       ],
     },
@@ -85,6 +128,7 @@ export function MoreScreen() {
       <div className="px-5 mt-6">
         <div className="rounded-3xl bg-foreground text-background p-6 overflow-hidden relative">
           <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-background/10 blur-2xl" />
+          <div className="absolute bottom-0 left-0 h-32 w-32 rounded-full bg-background/5 blur-3xl" />
           <div className="relative">
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] opacity-75">
               <Sparkles className="h-3.5 w-3.5" />
@@ -97,7 +141,7 @@ export function MoreScreen() {
             </p>
             <button
               onClick={() => navigate("studio-product")}
-              className="mt-4 inline-flex items-center gap-2 bg-background text-foreground h-10 px-5 rounded-full text-[13px] font-semibold uppercase tracking-wide active:scale-95 transition"
+              className="mt-4 inline-flex items-center gap-2 bg-background text-foreground h-10 px-5 rounded-full text-[13px] font-semibold uppercase tracking-wide active:scale-95 transition hover:opacity-90"
             >
               Create Studio
               <ChevronRight className="h-4 w-4" />
@@ -110,7 +154,7 @@ export function MoreScreen() {
       <div className="px-5 mt-6 space-y-6">
         {groups.map((g) => (
           <div key={g.title}>
-            <p className="text-[12px] uppercase tracking-[0.18em] text-muted-foreground mb-2">
+            <p className="text-[12px] uppercase tracking-[0.18em] text-muted-foreground mb-2 font-medium">
               {g.title}
             </p>
             <div className="rounded-2xl bg-secondary/40 divide-y divide-border overflow-hidden">
@@ -143,7 +187,7 @@ export function MoreScreen() {
           href="https://chat.z.ai"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground"
+          className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition"
         >
           <Github className="h-3.5 w-3.5" />
           Atré Studio · v1.0

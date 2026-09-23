@@ -5,7 +5,8 @@ import { useApp } from "@/lib/store";
 import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
 import { PrimaryCTA, SecondaryCTA } from "@/components/studio/cta";
-import { RefreshCw, Check, Heart } from "lucide-react";
+import { SmartImage } from "@/components/studio/smart-image";
+import { RefreshCw, Check, Heart, Layers, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ResultsScreen() {
@@ -14,15 +15,15 @@ export function ResultsScreen() {
     toggleImageSelected,
     navigate,
     setStudioStatus,
-    addGeneration,
     pushToast,
+    setActiveGeneration,
   } = useApp();
   const [regenerating, setRegenerating] = useState(false);
-  const [selectingAll, setSelectingAll] = useState(false);
 
   const images = studio.currentImages;
   const selectedCount = images.filter((i) => i.selected).length;
   const allSelected = images.length > 0 && selectedCount === images.length;
+  const hasHistory = studio.allGenerations.length > 1;
 
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -30,8 +31,6 @@ export function ResultsScreen() {
     } else {
       images.forEach((i) => !i.selected && toggleImageSelected(i.id));
     }
-    setSelectingAll(true);
-    setTimeout(() => setSelectingAll(false), 200);
   };
 
   const onRegenerate = async () => {
@@ -72,9 +71,63 @@ export function ResultsScreen() {
           Your collection
         </h1>
         <p className="text-[14px] text-muted-foreground mt-1">
-          {images.length} images created · {selectedCount} selected
+          {images.length} images · {selectedCount} selected
+          {hasHistory && (
+            <span className="ml-1.5">· {studio.allGenerations.length} generations</span>
+          )}
         </p>
       </div>
+
+      {/* Generation history strip */}
+      {hasHistory && (
+        <div className="mt-4 -mx-5 px-5">
+          <div className="flex items-center gap-2 mb-2.5">
+            <Layers className="h-3.5 w-3.5 text-muted-foreground" strokeWidth={1.75} />
+            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-medium">
+              Generations
+            </span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+            {studio.allGenerations.map((gen, gi) => {
+              const active = gi === studio.activeGeneration;
+              const cover = gen[0]?.url;
+              return (
+                <button
+                  key={gi}
+                  onClick={() => setActiveGeneration(gi)}
+                  className={cn(
+                    "relative shrink-0 h-20 w-16 overflow-hidden rounded-xl transition-all duration-200 active:scale-95",
+                    active
+                      ? "ring-2 ring-foreground ring-offset-2 ring-offset-background"
+                      : "ring-1 ring-border opacity-70 hover:opacity-100",
+                  )}
+                  aria-label={`Generation ${studio.allGenerations.length - gi}`}
+                  aria-pressed={active}
+                >
+                  {cover && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={cover}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1">
+                    <span className="text-white text-[10px] font-medium">
+                      {studio.allGenerations.length - gi}
+                    </span>
+                  </div>
+                  {active && (
+                    <div className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-foreground">
+                      <Check className="h-2.5 w-2.5 text-background" strokeWidth={3} />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Image grid */}
       <div className="px-5 mt-5">
@@ -95,17 +148,20 @@ export function ResultsScreen() {
                 useApp.getState().setSelectedImageIndex(i);
                 navigate("image-detail");
               }}
-              className="group relative overflow-hidden rounded-2xl bg-secondary aspect-[4/5] active:scale-[0.98] transition cursor-pointer"
+              className={cn(
+                "group relative overflow-hidden rounded-2xl bg-secondary aspect-[4/5] active:scale-[0.98] transition-all duration-300 cursor-pointer",
+                img.selected && "ring-2 ring-foreground ring-offset-2 ring-offset-background shadow-[0_12px_32px_-12px_rgba(0,0,0,0.25)]",
+              )}
               aria-label={`Image ${i + 1}${img.selected ? ", selected" : ""}`}
               aria-pressed={img.selected}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <SmartImage
                 src={img.url}
                 alt={`Generated fashion image ${i + 1}`}
-                loading="lazy"
-                className={cn(
-                  "absolute inset-0 h-full w-full object-cover transition-all duration-300",
+                rounded="rounded-2xl"
+                className="absolute inset-0"
+                imgClassName={cn(
+                  "transition-all duration-300",
                   img.selected ? "scale-100" : "scale-100 group-active:scale-105",
                 )}
               />
@@ -114,7 +170,7 @@ export function ResultsScreen() {
                 className={cn(
                   "absolute inset-0 transition-all duration-200 pointer-events-none",
                   img.selected
-                    ? "bg-foreground/0 ring-2 ring-foreground ring-inset"
+                    ? "bg-foreground/0"
                     : "bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100",
                 )}
               />
@@ -138,9 +194,28 @@ export function ResultsScreen() {
                 onClick={(e) => {
                   e.stopPropagation();
                   useApp.getState().toggleImageFavorite(img.id);
+                  // Also sync to favorites API
+                  fetch("/api/favorites", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      url: img.url,
+                      productName: studio.product?.name ?? "Untitled",
+                      remove: img.favorite,
+                    }),
+                  })
+                    .then((r) => r.json())
+                    .then((d) => {
+                      if (d.favorites) useApp.getState().setFavorites(d.favorites);
+                    })
+                    .catch(() => {});
+                  pushToast({
+                    title: img.favorite ? "Removed from favorites" : "Saved to favorites",
+                    variant: img.favorite ? "default" : "success",
+                  });
                 }}
                 aria-label="Toggle favorite"
-                className="absolute top-2.5 left-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-background/80 backdrop-blur"
+                className="absolute top-2.5 left-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-background/80 backdrop-blur active:scale-90 transition"
               >
                 <Heart
                   className={cn(
