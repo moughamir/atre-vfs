@@ -23,6 +23,9 @@ import { ShopScreen } from "@/components/screens/shop";
 import { ShopDetailScreen } from "@/components/screens/shop-detail";
 import { MoreScreen } from "@/components/screens/more";
 import { SuccessScreen } from "@/components/screens/success";
+import { ProjectsScreen } from "@/components/screens/projects";
+import { ProjectDetailScreen } from "@/components/screens/project-detail";
+import { FavoritesScreen } from "@/components/screens/favorites";
 
 import { Loader2 } from "lucide-react";
 
@@ -99,6 +102,12 @@ export default function Home() {
         return <MoreScreen />;
       case "success":
         return <SuccessScreen />;
+      case "projects":
+        return <ProjectsScreen />;
+      case "project-detail":
+        return <ProjectDetailScreen />;
+      case "favorites":
+        return <FavoritesScreen />;
       default:
         return <HomeScreen />;
     }

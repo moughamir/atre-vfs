@@ -102,3 +102,58 @@ Stage Summary:
 - Lint: 0 errors, 20 warnings (unused eslint-disable directives).
 - The full Product → Studio → Image → Review → Publish → Shop loop works.
 - Cron job will continue QA + feature development every 15 minutes.
+
+---
+
+Task ID: CRON-2
+Agent: Z.ai Code (webDevReview cron)
+Task: QA + implement project persistence + favorites + new screens + styling polish
+
+Work Log:
+- Reviewed worklog.md — MVP was complete; priorities were: preset images, project persistence, generation history, styling polish
+- Started dev server, ran agent-browser QA on Home/Products/Shop/More/Studio — all rendering correctly, no console errors
+- Generated all 10 preset preview images via z-ai image CLI (4 scenes + 6 styles, 1024x1024 JPEGs)
+- Implemented project persistence (FR-022, FR-027):
+  - Created /api/projects (GET, POST) and /api/projects/[id] (GET, PATCH, DELETE, PUT for adding generations)
+  - Created /lib/api.ts client helper with createProject, patchProject, addGenerationToProject, fetchProjects
+  - Extended Zustand store with: studio.id, projects[], favorites[], selectedProjectId, setProjects/upsertProject/removeProject, setFavorites/addFavorite/removeFavorite
+  - Updated Generating screen to: create project on first generation, persist generation via PUT, mark failed on error
+- Implemented Favorites persistence:
+  - Created /api/favorites (GET, POST) using JSON file storage at /public/favorites.json
+  - Updated Image Detail screen to call toggleFavoriteAPI + sync global favorites state
+  - Favorite state derived from persisted favorites list (resilient across reloads)
+- Built 3 new screens:
+  - **Projects screen** (`/components/screens/projects.tsx`): "Your studios" with "In progress" + "Ready" sections, project rows showing config + image count + status badge, "Start a new studio" CTA, empty state
+  - **Project Detail screen** (`/components/screens/project-detail.tsx`): cover image with "Latest generation" badge, config summary (Model/Scene/Style/Generations), generation history grid showing all past generations with dates, "Open in studio" CTA that resumes the flow with persisted config
+  - **Favorites screen** (`/components/screens/favorites.tsx`): "Collection" with grid of saved images, each with download/share/remove actions, empty state
+- Added Home screen quick-access tiles: Projects + Favorites cards showing counts, in-progress banner with pulsing dot
+- Styling polish (per VLM feedback):
+  - ChoiceCard: added hover/selected shadow elevation (shadow-[0_12px_32px_-12px_rgba(0,0,0,0.25)])
+  - Bottom nav FAB: -mt-6 elevation, scale-110 on active, glow ring effect, hover scale-105
+  - PrimaryCTA: sheen sweep animation on hover, stronger shadow, gradient hover
+  - Home greeting: increased letter-spacing to 0.24em, font-medium
+  - Home headline: 36px with -0.01em tracking
+  - Product cards: stronger title (semibold 15px), price+category on baseline row with uppercase category
+  - Created SmartImage component with skeleton shimmer + fade-in transition
+  - Added globals.css: fadeIn animation, focus-visible outline ring for accessibility
+- Fixed Project Detail ConfigRow layout bug (was causing text overlap per VLM): changed from flex justify-between single-child to two-column baseline layout with line-clamp hint
+- Fixed Project Detail cover image: switched to SmartImage with skeleton loading
+
+Verification Results:
+- E2E test confirmed: Studio flow → Generation → project persisted to DB (id, productId, model:woman, scene:studio, style:luxury, status:ready, 1 generation, 4 images) ✓
+- Favorites API confirmed: 1 favorite saved with productName "White Linen Shirt" ✓
+- Projects screen: shows persisted project "White Linen Shirt · Studio · Luxury · 4 images · READY" ✓
+- Project Detail: cover image loads, GENERATION HISTORY section renders, OPEN IN STUDIO CTA works ✓
+- All 10 preset images return HTTP 200 ✓
+- Lint: 0 errors, 25 warnings (unused eslint-disable directives, harmless) ✓
+- No console errors across all tested screens ✓
+- VLM rated improved Project Detail 8/10 (up from layout-bug version)
+
+Stage Summary:
+- Project persistence is LIVE: users can leave and return to active projects (FR-022, FR-027 ✓)
+- Generation history is surfaced in Project Detail (FR-024 ✓)
+- Favorites are persisted across sessions and viewable in a dedicated Collection screen
+- 3 new screens added (Projects, Project Detail, Favorites) — all accessible from Home quick-access tiles
+- Visual polish: shadow elevation, sheen animations, refined typography, skeleton loaders, accessibility focus rings
+- All preset ChoiceCards now show real photography instead of gradient fallbacks
+- Dev server running on port 3000 with keep-alive wrapper (HTTP 200)

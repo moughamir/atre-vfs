@@ -5,12 +5,14 @@ import { useApp } from "@/lib/store";
 import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
 import { getGreeting, formatPrice } from "@/lib/presets";
-import { Sparkles, Bell, ArrowRight, Plus } from "lucide-react";
-import type { Product, Listing } from "@/lib/types";
+import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock } from "lucide-react";
+import type { Product, Listing, ProjectSummary, FavoriteImage } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchProjects, fetchFavorites } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export function HomeScreen() {
-  const { navigate, setActiveTab, startStudio, pushToast } = useApp();
+  const { navigate, setActiveTab, startStudio, pushToast, setProjects, setFavorites, projects, favorites } = useApp();
   const [products, setProducts] = useState<Product[]>([]);
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,14 +22,18 @@ export function HomeScreen() {
     (async () => {
       setLoading(true);
       try {
-        const [pRes, lRes] = await Promise.all([
+        const [pRes, lRes, projs, favs] = await Promise.all([
           fetch("/api/products").then((r) => r.json()),
           fetch("/api/listings").then((r) => r.json()),
+          fetchProjects(),
+          fetchFavorites(),
         ]);
         if (cancelled) return;
         setProducts(pRes.products ?? []);
         setListings(lRes.listings ?? []);
         useApp.getState().setListings(lRes.listings ?? []);
+        setProjects(projs);
+        setFavorites(favs);
       } catch {
         // ignore
       } finally {
@@ -37,10 +43,14 @@ export function HomeScreen() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const greeting = getGreeting();
   const recent = products.slice(0, 6);
+  const inProgress = projects.filter(
+    (p) => p.status === "configuring" || p.status === "generating" || p.status === "failed",
+  );
 
   const onStartStudio = () => {
     navigate("studio-product");
@@ -61,10 +71,10 @@ export function HomeScreen() {
       />
 
       <div className="px-5 pt-2 pb-4">
-        <p className="text-[13px] uppercase tracking-[0.18em] text-muted-foreground">
+        <p className="text-[12px] uppercase tracking-[0.24em] text-muted-foreground font-medium">
           {greeting}
         </p>
-        <h1 className="font-display text-[34px] leading-[1.05] mt-1">
+        <h1 className="font-display text-[36px] leading-[1.02] mt-2 tracking-[-0.01em]">
           Let&rsquo;s create
           <br />
           something.
@@ -107,6 +117,68 @@ export function HomeScreen() {
           </div>
         </button>
       </div>
+
+      {/* Quick access tiles */}
+      <div className="mt-5 px-5 grid grid-cols-2 gap-3">
+        <button
+          onClick={() => navigate("projects")}
+          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-4 text-left active:scale-[0.98] transition hover:bg-secondary"
+          aria-label="View all projects"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
+              <Layers className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="font-display text-[18px] mt-3">Projects</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            {projects.length} studio{projects.length === 1 ? "" : "s"}
+          </p>
+          {inProgress.length > 0 && (
+            <span className="absolute top-3 right-3 flex h-2 w-2 rounded-full bg-foreground animate-pulse" />
+          )}
+        </button>
+        <button
+          onClick={() => navigate("favorites")}
+          className="relative overflow-hidden rounded-2xl bg-secondary/60 p-4 text-left active:scale-[0.98] transition hover:bg-secondary"
+          aria-label="View favorites"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
+              <Heart className="h-4 w-4" strokeWidth={1.75} />
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="font-display text-[18px] mt-3">Favorites</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            {favorites.length} saved
+          </p>
+        </button>
+      </div>
+
+      {/* In-progress banner */}
+      {!loading && inProgress.length > 0 && (
+        <div className="mt-4 px-5">
+          <button
+            onClick={() => navigate("projects")}
+            className="w-full rounded-2xl bg-foreground text-background p-4 flex items-center gap-3 active:scale-[0.99] transition"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-background/15">
+              <Clock className="h-5 w-5" strokeWidth={1.75} />
+            </span>
+            <div className="flex-1 text-left">
+              <p className="text-[13px] font-medium">
+                {inProgress.length} project{inProgress.length === 1 ? "" : "s"} in progress
+              </p>
+              <p className="text-[12px] opacity-75">
+                Pick up where you left off
+              </p>
+            </div>
+            <ChevronRight className="h-4 w-4 opacity-80" />
+          </button>
+        </div>
+      )}
 
       {/* Recent Projects */}
       <div className="mt-8 px-5">
@@ -161,12 +233,17 @@ export function HomeScreen() {
                     <StatusPill status={p.status} />
                   </div>
                 </div>
-                <div className="mt-2">
-                  <div className="text-[14px] font-medium leading-tight line-clamp-1">
+                <div className="mt-2.5">
+                  <div className="text-[15px] font-semibold leading-tight line-clamp-1 tracking-[-0.005em]">
                     {p.name}
                   </div>
-                  <div className="text-[12px] text-muted-foreground mt-0.5">
-                    {formatPrice(p.price, p.currency)} · {p.category}
+                  <div className="flex items-baseline gap-1.5 mt-1">
+                    <span className="text-[13px] font-medium text-foreground">
+                      {formatPrice(p.price, p.currency)}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground/80 uppercase tracking-wide">
+                      {p.category}
+                    </span>
                   </div>
                 </div>
               </button>

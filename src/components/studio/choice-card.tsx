@@ -40,7 +40,9 @@ export function ChoiceCard({
       aria-pressed={selected}
       className={cn(
         "group relative overflow-hidden rounded-3xl bg-secondary text-left transition-all duration-300 active:scale-[0.97]",
-        selected ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : "ring-1 ring-border",
+        selected
+          ? "ring-2 ring-foreground ring-offset-2 ring-offset-background shadow-[0_12px_32px_-12px_rgba(0,0,0,0.25)]"
+          : "ring-1 ring-border hover:ring-foreground/30 hover:shadow-[0_8px_20px_-12px_rgba(0,0,0,0.18)]",
         className,
       )}
     >

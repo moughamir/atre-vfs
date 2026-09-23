@@ -21,7 +21,10 @@ export type ScreenId =
   | "shop"
   | "shop-detail"
   | "more"
-  | "success";
+  | "success"
+  | "favorites"
+  | "projects"
+  | "project-detail";
 
 export type ModelOption = "none" | "woman" | "man" | "custom";
 export type ModelPreference = "natural" | "elegant" | "editorial";
@@ -70,6 +73,38 @@ export interface GeneratedImage {
   selected: boolean;
   favorite: boolean;
   prompt: string;
+}
+
+export interface Generation {
+  id: string;
+  prompt: string;
+  model: string;
+  scene: string;
+  style: string;
+  status: string;
+  images: string[];
+  createdAt: string;
+}
+
+export interface ProjectSummary {
+  id: string;
+  productId: string;
+  model: string;
+  modelPreference: string | null;
+  scene: string;
+  style: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  product: Product;
+  generations: Generation[];
+}
+
+export interface FavoriteImage {
+  id: string;
+  url: string;
+  productName: string;
+  createdAt: string;
 }
 
 export interface StudioProjectState {

@@ -7,9 +7,10 @@ import { GENERATION_STEPS } from "@/lib/presets";
 import { Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GeneratedImage } from "@/lib/types";
+import { createProject, addGenerationToProject, patchProject } from "@/lib/api";
 
 export function GeneratingScreen() {
-  const { studio, navigate, setStudioStatus, addGeneration, pushToast } = useApp();
+  const { studio, navigate, setStudioStatus, addGeneration, pushToast, setStudioProjectId, upsertProject } = useApp();
   const [step, setStep] = useState(0);
   const startedRef = useRef(false);
 
@@ -30,6 +31,24 @@ export function GeneratingScreen() {
     });
 
     const run = async () => {
+      // 1. Ensure the project is persisted (create if not yet saved)
+      let projectId = studio.id;
+      if (!projectId && studio.product) {
+        const proj = await createProject(
+          studio.product.id,
+          studio.model,
+          studio.modelPreference,
+          studio.scene,
+          studio.style,
+        );
+        if (proj) {
+          projectId = proj.id;
+          setStudioProjectId(proj.id);
+          upsertProject(proj);
+        }
+      }
+
+      // 2. Call the generation API
       try {
         const res = await fetch("/api/studio/generate", {
           method: "POST",
@@ -61,6 +80,18 @@ export function GeneratingScreen() {
           }),
         );
         addGeneration(images);
+
+        // 3. Persist the generation to the project
+        if (projectId) {
+          await addGenerationToProject(projectId, {
+            prompt: data.prompts?.[0] ?? "",
+            model: studio.model,
+            scene: studio.scene,
+            style: studio.style,
+            images: data.images,
+          });
+        }
+
         setStudioStatus("ready");
         setTimeout(() => {
           if (!cancelled) navigate("results");
@@ -69,6 +100,10 @@ export function GeneratingScreen() {
         if (cancelled) return;
         console.error("Generation failed", e);
         setStudioStatus("failed");
+        // Mark project as failed in DB
+        if (projectId) {
+          await patchProject(projectId, { status: "failed" }).catch(() => {});
+        }
         pushToast({
           title: "We couldn't create your images.",
           description: "Your settings are safe. Try again.",

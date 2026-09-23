@@ -13,9 +13,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { toggleFavoriteAPI } from "@/lib/api";
 
 export function ImageDetailScreen() {
-  const { studio, selectedImageIndex, setSelectedImageIndex, toggleImageFavorite, navigate, pushToast } = useApp();
+  const { studio, selectedImageIndex, setSelectedImageIndex, toggleImageFavorite, favorites, navigate, pushToast } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const img =
@@ -34,7 +35,22 @@ export function ImageDetailScreen() {
     );
   }
 
-  const favorite = img.favorite;
+  // Derive favorite state from the global favorites list (persisted) for resilience
+  const isFavorited =
+    favorites.some((f) => f.url === img.url) || img.favorite;
+
+  const onToggleFavorite = async () => {
+    toggleImageFavorite(img.id); // optimistic local toggle
+    const productName = studio.product?.name ?? "Untitled";
+    const updated = await toggleFavoriteAPI(img.url, productName, isFavorited);
+    if (updated) {
+      useApp.getState().setFavorites(updated);
+    }
+    pushToast({
+      title: isFavorited ? "Removed from favorites" : "Saved to favorites",
+      variant: isFavorited ? "default" : "success",
+    });
+  };
 
   const onDownload = async () => {
     try {
@@ -109,10 +125,10 @@ export function ImageDetailScreen() {
               </SheetHeader>
               <div className="mt-3 space-y-1">
                 <SheetItem
-                  icon={<Heart className={cn("h-5 w-5", favorite && "fill-foreground")} />}
-                  label={favorite ? "Remove favorite" : "Save to favorites"}
+                  icon={<Heart className={cn("h-5 w-5", isFavorited && "fill-foreground")} />}
+                  label={isFavorited ? "Remove favorite" : "Save to favorites"}
                   onClick={() => {
-                    toggleImageFavorite(img.id);
+                    onToggleFavorite();
                     setSheetOpen(false);
                   }}
                 />
@@ -164,9 +180,9 @@ export function ImageDetailScreen() {
         >
           <div className="mx-auto max-w-md px-5 py-3 flex items-center justify-around">
             <ActionIcon
-              icon={<Heart className={cn("h-6 w-6", favorite && "fill-background")} />}
+              icon={<Heart className={cn("h-6 w-6", isFavorited && "fill-background")} />}
               label="Save"
-              onClick={() => toggleImageFavorite(img.id)}
+              onClick={onToggleFavorite}
             />
             <ActionIcon
               icon={<Pencil className="h-6 w-6" />}

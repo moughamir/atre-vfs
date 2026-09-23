@@ -25,7 +25,7 @@ export function PrimaryCTA({
 }: PrimaryCTAProps) {
   return (
     <div
-      className="sticky bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-background via-background to-background/0 pt-3"
+      className="sticky bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-background via-background to-background/0 pt-4"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 88px)" }}
     >
       <div className="mx-auto max-w-md px-5">
@@ -33,19 +33,29 @@ export function PrimaryCTA({
           onClick={onClick}
           disabled={disabled || loading}
           className={cn(
-            "group relative w-full h-14 rounded-full text-[15px] font-semibold tracking-wide transition-all duration-300 flex items-center justify-center gap-2.5 overflow-hidden",
-            "active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100",
+            "group relative w-full h-14 rounded-full text-[15px] font-semibold tracking-[0.12em] transition-all duration-300 flex items-center justify-center gap-2.5 overflow-hidden",
+            "active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100 disabled:shadow-none",
             variant === "primary" &&
-              "bg-foreground text-background shadow-[0_8px_24px_-8px_rgba(0,0,0,0.35)]",
+              "bg-foreground text-background shadow-[0_12px_28px_-10px_rgba(0,0,0,0.4)] hover:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.5)]",
             variant === "outline" &&
               "bg-transparent text-foreground border border-border hover:border-foreground/40",
             variant === "ghost" && "bg-transparent text-foreground hover:bg-foreground/5",
             className,
           )}
         >
-          {loading && <Loader2 className="h-5 w-5 animate-spin" />}
-          {!loading && icon}
-          <span className="uppercase tracking-[0.12em]">{children}</span>
+          {/* Sheen sweep on hover */}
+          {variant === "primary" && !disabled && !loading && (
+            <span
+              className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
+              }}
+            />
+          )}
+          {loading && <Loader2 className="h-5 w-5 animate-spin relative" />}
+          {!loading && icon && <span className="relative">{icon}</span>}
+          <span className="uppercase tracking-[0.12em] relative">{children}</span>
         </button>
       </div>
     </div>

@@ -12,6 +12,8 @@ import type {
   GeneratedImage,
   ProjectStatus,
   Listing,
+  ProjectSummary,
+  FavoriteImage,
 } from "@/lib/types";
 
 interface ToastMsg {
@@ -32,9 +34,11 @@ interface AppState {
   selectedProductId: string | null;
   selectedImageIndex: number | null;
   selectedListingId: string | null;
+  selectedProjectId: string | null;
 
   // Studio flow
   studio: {
+    id: string | null;
     product: Product | null;
     model: ModelOption;
     modelPreference: ModelPreference | null;
@@ -49,6 +53,14 @@ interface AppState {
   // Shop
   listings: Listing[];
 
+  // Projects (persisted)
+  projects: ProjectSummary[];
+  projectsLoaded: boolean;
+
+  // Favorites (persisted)
+  favorites: FavoriteImage[];
+  favoritesLoaded: boolean;
+
   // Toasts (lightweight, separate from sonner for screen-driven messaging)
   toasts: ToastMsg[];
 
@@ -60,9 +72,11 @@ interface AppState {
   selectProduct: (product: Product) => void;
   setSelectedImageIndex: (i: number | null) => void;
   openListing: (id: string) => void;
+  openProject: (id: string) => void;
 
   // Studio actions
   startStudio: (product: Product) => void;
+  setStudioProjectId: (id: string | null) => void;
   setStudioModel: (m: ModelOption) => void;
   setStudioModelPreference: (p: ModelPreference | null) => void;
   setStudioScene: (s: SceneOption) => void;
@@ -80,12 +94,23 @@ interface AppState {
   setListings: (l: Listing[]) => void;
   addListing: (l: Listing) => void;
 
+  // Projects
+  setProjects: (p: ProjectSummary[]) => void;
+  upsertProject: (p: ProjectSummary) => void;
+  removeProject: (id: string) => void;
+
+  // Favorites
+  setFavorites: (f: FavoriteImage[]) => void;
+  addFavorite: (f: FavoriteImage) => void;
+  removeFavorite: (url: string) => void;
+
   // Toasts
   pushToast: (t: Omit<ToastMsg, "id">) => void;
   dismissToast: (id: string) => void;
 }
 
 const initialStudio = {
+  id: null as string | null,
   product: null as Product | null,
   model: "woman" as ModelOption,
   modelPreference: null as ModelPreference | null,
@@ -106,9 +131,14 @@ export const useApp = create<AppState>((set, get) => ({
   selectedProductId: null,
   selectedImageIndex: null,
   selectedListingId: null,
+  selectedProjectId: null,
 
   studio: initialStudio,
   listings: [],
+  projects: [],
+  projectsLoaded: false,
+  favorites: [],
+  favoritesLoaded: false,
   toasts: [],
 
   setActiveTab: (tab) => {
@@ -150,9 +180,13 @@ export const useApp = create<AppState>((set, get) => ({
         products: "products",
         "product-detail": "products",
         "add-product": "products",
+        "edit-product": "products",
         shop: "shop",
         "shop-detail": "shop",
         more: "more",
+        favorites: "home",
+        projects: "home",
+        "project-detail": "home",
         "studio-product": "studio",
         "studio-model": "studio",
         "studio-scene": "studio",
@@ -185,6 +219,11 @@ export const useApp = create<AppState>((set, get) => ({
     get().navigate("shop-detail");
   },
 
+  openProject: (id) => {
+    set({ selectedProjectId: id });
+    get().navigate("project-detail");
+  },
+
   // Studio
   startStudio: (product) => {
     set({
@@ -198,6 +237,9 @@ export const useApp = create<AppState>((set, get) => ({
       activeTab: "studio",
     });
   },
+
+  setStudioProjectId: (id) =>
+    set((s) => ({ studio: { ...s.studio, id } })),
 
   setStudioModel: (m) => set((s) => ({ studio: { ...s.studio, model: m } })),
   setStudioModelPreference: (p) =>
@@ -246,6 +288,26 @@ export const useApp = create<AppState>((set, get) => ({
 
   setListings: (l) => set({ listings: l }),
   addListing: (l) => set((s) => ({ listings: [l, ...s.listings] })),
+
+  // Projects
+  setProjects: (p) => set({ projects: p, projectsLoaded: true }),
+  upsertProject: (p) =>
+    set((s) => ({
+      projects: [p, ...s.projects.filter((x) => x.id !== p.id)],
+    })),
+  removeProject: (id) =>
+    set((s) => ({ projects: s.projects.filter((p) => p.id !== id) })),
+
+  // Favorites
+  setFavorites: (f) => set({ favorites: f, favoritesLoaded: true }),
+  addFavorite: (f) =>
+    set((s) =>
+      s.favorites.some((x) => x.url === f.url)
+        ? s
+        : { favorites: [f, ...s.favorites] },
+    ),
+  removeFavorite: (url) =>
+    set((s) => ({ favorites: s.favorites.filter((f) => f.url !== url) })),
 
   pushToast: (t) => {
     const id = Math.random().toString(36).slice(2);
