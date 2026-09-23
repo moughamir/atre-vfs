@@ -5,7 +5,7 @@ import { useApp } from "@/lib/store";
 import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
 import { getGreeting, formatPrice } from "@/lib/presets";
-import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock } from "lucide-react";
+import { Sparkles, Bell, ArrowRight, Plus, Heart, Layers, ChevronRight, Clock, ShoppingBag } from "lucide-react";
 import type { Product, Listing, ProjectSummary, FavoriteImage } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchProjects, fetchFavorites } from "@/lib/api";
@@ -118,6 +118,30 @@ export function HomeScreen() {
           </div>
         </button>
       </div>
+
+      {/* Stats strip */}
+      {!loading && (projects.length > 0 || listings.length > 0 || favorites.length > 0) && (
+        <div className="mt-5 px-5 grid grid-cols-3 gap-2.5">
+          <StatCard
+            icon={<Layers className="h-3.5 w-3.5" strokeWidth={2} />}
+            value={projects.length}
+            label="Projects"
+            onClick={() => navigate("projects")}
+          />
+          <StatCard
+            icon={<ShoppingBag className="h-3.5 w-3.5" strokeWidth={2} />}
+            value={listings.length}
+            label="Published"
+            onClick={() => setActiveTab("shop")}
+          />
+          <StatCard
+            icon={<Heart className="h-3.5 w-3.5" strokeWidth={2} />}
+            value={favorites.length}
+            label="Favorites"
+            onClick={() => navigate("favorites")}
+          />
+        </div>
+      )}
 
       {/* Quick access tiles */}
       <div className="mt-5 px-5 grid grid-cols-2 gap-3">
@@ -316,5 +340,33 @@ function StatusPill({ status }: { status: string }) {
     >
       {s.label}
     </span>
+  );
+}
+
+function StatCard({
+  icon,
+  value,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-2xl bg-secondary/50 p-3 flex flex-col items-center text-center active:scale-95 transition hover:bg-secondary"
+      aria-label={`${value} ${label}`}
+    >
+      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-background mb-1.5">
+        {icon}
+      </span>
+      <span className="font-display text-[20px] leading-none">{value}</span>
+      <span className="text-[10px] uppercase tracking-wide text-muted-foreground mt-1">
+        {label}
+      </span>
+    </button>
   );
 }

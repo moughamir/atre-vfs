@@ -96,7 +96,7 @@ export function MoreScreen() {
         {
           icon: Settings,
           label: "Settings",
-          onClick: () => pushToast({ title: "Settings coming soon" }),
+          onClick: () => navigate("settings"),
         },
         {
           icon: HelpCircle,

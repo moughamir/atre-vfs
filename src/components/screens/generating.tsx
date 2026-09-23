@@ -10,7 +10,7 @@ import type { GeneratedImage } from "@/lib/types";
 import { createProject, addGenerationToProject, patchProject } from "@/lib/api";
 
 export function GeneratingScreen() {
-  const { studio, navigate, setStudioStatus, addGeneration, pushToast, setStudioProjectId, upsertProject } = useApp();
+  const { studio, navigate, setStudioStatus, addGeneration, pushToast, setStudioProjectId, upsertProject, settings } = useApp();
   const [step, setStep] = useState(0);
   const startedRef = useRef(false);
 
@@ -60,7 +60,7 @@ export function GeneratingScreen() {
             modelPreference: studio.modelPreference,
             scene: studio.scene,
             style: studio.style,
-            count: 4,
+            count: settings.generationCount,
           }),
         });
         if (cancelled) return;

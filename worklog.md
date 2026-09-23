@@ -216,3 +216,59 @@ Stage Summary:
 - More screen restructured with Library section + Appearance toggle ✓
 - Edit Image flow now feeds regenerated images back as new generations (visible in history strip) ✓
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-4
+Agent: Z.ai Code (webDevReview cron)
+Task: Settings screen + onboarding flow + Home stats + settings-driven defaults
+
+Work Log:
+- Reviewed worklog.md — CRON-3 completed generation history, SmartImage, Shop search/sort, dark mode
+- Ran agent-browser QA on Home/Products/Shop/More/Studio — all rendering, no console errors
+- Implemented user Settings with localStorage persistence:
+  - Added UserSettings type (defaultModel, defaultScene, defaultStyle, generationCount, hasOnboarded)
+  - Added loadSettings/persistSettings helpers + SETTINGS_KEY
+  - Added settings state + setSettings/completeOnboarding actions to Zustand store
+  - Wired startStudio to apply settings defaults (defaultModel/Scene/Style)
+  - Wired Generating screen to use settings.generationCount instead of hardcoded 4
+- Built Settings screen (`/components/screens/settings.tsx`):
+  - 3 tabbed sections: Defaults / Generation / Data
+  - Defaults: model preset chips (Woman/Man/No model/Custom), scene chips (Studio/Street/Lifestyle/Editorial), style chips (Clean/Luxury/Summer/Editorial/Urban/Minimal) — all with active ring + check
+  - Generation: 1-4 image count selector with descriptive labels, pro tip card
+  - Data: favorites/projects counts, "Clear favorites & reset settings" with AlertDialog confirmation
+  - Done CTA at bottom
+- Built Onboarding screen (`/components/screens/onboarding.tsx`):
+  - 3-slide intro: "Turn products into shoots" → "Generate in minutes" → "Publish to your shop"
+  - Each slide: gradient icon badge with blur glow, step indicator dots, serif headline, description
+  - Last slide shows feature checklist (AI image generation, Project persistence, Shop with search & sort, Dark mode)
+  - Skip button, Continue/Start creating CTAs with sheen sweep animation, Back button on slides 2-3
+  - Calls completeOnboarding() → persists hasOnboarded=true → navigates to home
+- Wired onboarding into boot logic: page.tsx checks settings.hasOnboarded after seed, navigates to onboarding if first-time
+- Added onboarding + settings to ScreenId type + goBack tabMap
+- More screen: Settings button now navigates to settings screen (was a toast placeholder)
+- Added Stats strip to Home screen:
+  - 3-column grid: Projects / Published / Favorites with icon + count + label
+  - Only shows when user has data (projects > 0 OR listings > 0 OR favorites > 0)
+  - Each stat card is clickable → navigates to respective screen
+  - Created StatCard component with icon badge + display font count + uppercase label
+
+Verification Results:
+- Onboarding flow: slide 1 "Turn products into shoots" → Continue → slide 2 "Generate in minutes" → Continue → slide 3 "Publish to your shop" with feature checklist → Start creating → Home ✓
+- After onboarding: Home shows new Stats strip "1 Projects · 1 Published · 1 Favorites" ✓
+- Settings screen: renders with 3 tabs (Defaults/Generation/Data), all preset chips visible (Woman/Man/No model/My model + Studio/Street/Lifestyle/Editorial + Clean/Luxury/Summer/...) ✓
+- Settings persists to localStorage (atre-settings key) ✓
+- startStudio applies settings defaults ✓
+- Generating uses settings.generationCount ✓
+- No console errors ✓
+- Lint: 0 errors, 21 warnings (unused eslint-disable directives) ✓
+- VLM rated Settings "minimalist, high contrast for selected states, standard mobile settings pattern" ✓
+- VLM rated Onboarding "premium, minimalist aesthetic, elegant serif, subtle drop shadows, generous icon size" ✓
+
+Stage Summary:
+- Real Settings screen replaces the placeholder toast — 3 sections with persistent defaults, generation count, and data management ✓
+- Onboarding flow for first-time users — 3-slide intro with feature checklist, persisted via hasOnboarded flag ✓
+- Stats strip on Home — at-a-glance counts for Projects/Published/Favorites, clickable ✓
+- Settings now drive the studio flow: startStudio applies defaultModel/Scene/Style, Generating respects generationCount ✓
+- Total screens: 24 (was 21) — added Settings, Onboarding, (Lookbook placeholder in types)
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

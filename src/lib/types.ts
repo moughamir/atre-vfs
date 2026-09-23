@@ -24,7 +24,10 @@ export type ScreenId =
   | "success"
   | "favorites"
   | "projects"
-  | "project-detail";
+  | "project-detail"
+  | "settings"
+  | "onboarding"
+  | "lookbook";
 
 export type ModelOption = "none" | "woman" | "man" | "custom";
 export type ModelPreference = "natural" | "elegant" | "editorial";

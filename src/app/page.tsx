@@ -26,11 +26,15 @@ import { SuccessScreen } from "@/components/screens/success";
 import { ProjectsScreen } from "@/components/screens/projects";
 import { ProjectDetailScreen } from "@/components/screens/project-detail";
 import { FavoritesScreen } from "@/components/screens/favorites";
+import { SettingsScreen } from "@/components/screens/settings";
+import { OnboardingScreen } from "@/components/screens/onboarding";
 
 import { Loader2 } from "lucide-react";
 
 export default function Home() {
   const screen = useApp((s) => s.screen);
+  const settings = useApp((s) => s.settings);
+  const navigate = useApp((s) => s.navigate);
   const [booting, setBooting] = useState(true);
 
   // Boot: seed DB on first load so the user sees a populated catalog
@@ -42,12 +46,19 @@ export default function Home() {
       } catch {
         // ignore — not critical
       } finally {
-        if (!cancelled) setBooting(false);
+        if (!cancelled) {
+          // Show onboarding for first-time users
+          if (!settings.hasOnboarded) {
+            navigate("onboarding");
+          }
+          setBooting(false);
+        }
       }
     })();
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (booting) {
@@ -108,13 +119,17 @@ export default function Home() {
         return <ProjectDetailScreen />;
       case "favorites":
         return <FavoritesScreen />;
+      case "settings":
+        return <SettingsScreen />;
+      case "onboarding":
+        return <OnboardingScreen />;
       default:
         return <HomeScreen />;
     }
   };
 
   // Screens that take over the whole viewport (no bottom nav, no max-width)
-  const immersive = ["generating", "image-detail", "success"];
+  const immersive = ["generating", "image-detail", "success", "onboarding"];
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground">

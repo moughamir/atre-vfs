@@ -23,6 +23,44 @@ interface ToastMsg {
   variant?: "default" | "success" | "destructive";
 }
 
+export interface UserSettings {
+  defaultModel: ModelOption;
+  defaultScene: SceneOption;
+  defaultStyle: StyleOption;
+  generationCount: number; // 1..4
+  hasOnboarded: boolean;
+}
+
+const defaultSettings: UserSettings = {
+  defaultModel: "woman",
+  defaultScene: "studio",
+  defaultStyle: "clean",
+  generationCount: 4,
+  hasOnboarded: false,
+};
+
+const SETTINGS_KEY = "atre-settings";
+
+function loadSettings(): UserSettings {
+  if (typeof window === "undefined") return defaultSettings;
+  try {
+    const raw = window.localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return defaultSettings;
+    return { ...defaultSettings, ...(JSON.parse(raw) as Partial<UserSettings>) };
+  } catch {
+    return defaultSettings;
+  }
+}
+
+function persistSettings(s: UserSettings) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  } catch {
+    // ignore
+  }
+}
+
 interface AppState {
   // Navigation
   activeTab: TabId;
@@ -61,6 +99,9 @@ interface AppState {
   // Favorites (persisted)
   favorites: FavoriteImage[];
   favoritesLoaded: boolean;
+
+  // Settings (persisted to localStorage)
+  settings: UserSettings;
 
   // Toasts (lightweight, separate from sonner for screen-driven messaging)
   toasts: ToastMsg[];
@@ -106,6 +147,10 @@ interface AppState {
   addFavorite: (f: FavoriteImage) => void;
   removeFavorite: (url: string) => void;
 
+  // Settings
+  setSettings: (s: Partial<UserSettings>) => void;
+  completeOnboarding: () => void;
+
   // Toasts
   pushToast: (t: Omit<ToastMsg, "id">) => void;
   dismissToast: (id: string) => void;
@@ -142,6 +187,7 @@ export const useApp = create<AppState>((set, get) => ({
   projectsLoaded: false,
   favorites: [],
   favoritesLoaded: false,
+  settings: loadSettings(),
   toasts: [],
 
   setActiveTab: (tab) => {
@@ -190,6 +236,9 @@ export const useApp = create<AppState>((set, get) => ({
         favorites: "home",
         projects: "home",
         "project-detail": "home",
+        settings: "more",
+        lookbook: "shop",
+        onboarding: "home",
         "studio-product": "studio",
         "studio-model": "studio",
         "studio-scene": "studio",
@@ -229,10 +278,14 @@ export const useApp = create<AppState>((set, get) => ({
 
   // Studio
   startStudio: (product) => {
+    const s = get().settings;
     set({
       studio: {
         ...initialStudio,
         product,
+        model: s.defaultModel,
+        scene: s.defaultScene,
+        style: s.defaultStyle,
         status: "configuring",
       },
       screen: "studio-product",
@@ -325,6 +378,20 @@ export const useApp = create<AppState>((set, get) => ({
     ),
   removeFavorite: (url) =>
     set((s) => ({ favorites: s.favorites.filter((f) => f.url !== url) })),
+
+  // Settings
+  setSettings: (patch) =>
+    set((s) => {
+      const next = { ...s.settings, ...patch };
+      persistSettings(next);
+      return { settings: next };
+    }),
+  completeOnboarding: () =>
+    set((s) => {
+      const next = { ...s.settings, hasOnboarded: true };
+      persistSettings(next);
+      return { settings: next };
+    }),
 
   pushToast: (t) => {
     const id = Math.random().toString(36).slice(2);
