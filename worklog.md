@@ -322,3 +322,57 @@ Stage Summary:
 - Home redesigned with 3-column quick access (Projects/Lookbook/Favorites) ✓
 - Total screens: 25 (was 24) — added Lookbook
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: CRON-6
+Agent: Z.ai Code (webDevReview cron)
+Task: Help/FAQ screen + Image Variations feature + Variations API
+
+Work Log:
+- Reviewed worklog.md — CRON-5 completed Lookbook, 8 style presets, batch download, Home 3-column layout
+- Ran agent-browser QA on Home/Products/Shop/More/Lookbook/Settings — all rendering, no console errors
+- Built Help/FAQ screen (`/components/screens/help.tsx`):
+  - Replaces the placeholder toast on More → Help
+  - 5 FAQ categories with 15 questions total:
+    - Getting started (3 Qs: create first studio, need product photo, generation time)
+    - Studio & generation (4 Qs: model/scene/style difference, edit single image, product fidelity, model preferences)
+    - Projects & history (3 Qs: projects saved, lookbook, favorites)
+    - Publishing & shop (3 Qs: publish to shop, edit AI description, search/sort shop)
+    - Settings & data (3 Qs: default preferences, dark mode, data storage)
+  - Accordion UI with smooth expand/collapse, chevron rotation
+  - 6 quick-link chips: Create a studio / View projects / Open lookbook / Browse shop / See favorites / Open settings
+  - "Still need help?" contact card with Feedback CTA
+- Built Image Variations feature (new):
+  - Created /api/studio/variations API route:
+    - Generates 3 variation images based on a source image
+    - Variation prompts emphasize subtle composition/pose/lighting differences while preserving product identity
+    - Saves to /public/generated/ with "var-" prefix
+  - Built Variations screen (`/components/screens/variations.tsx`):
+    - Immersive loading state with 4-step progress (Analyzing → Composing → Generating → Finalizing)
+    - Results: source image thumbnail + 3 variation cards in a 2-col grid
+    - Each variation: tap-to-select, favorite heart, download button, index badge (V01, V02, V03)
+    - Bottom bar: "New variations" (regenerate) + "Add to results" (merge selected into Results grid)
+    - Variations are added to the project's generation history via addGeneration()
+  - Added Variations entry points to Image Detail screen:
+    - New "Variations" action icon in the bottom action bar (between Edit and Download)
+    - New "Create variations" item in the ⋯ action sheet
+- Wired Help + Variations into types, store tabMap, and page.tsx routing
+- Updated More screen: Help button now navigates to the real Help screen (was a toast placeholder)
+
+Verification Results:
+- Help screen: "Help center" heading + 6 quick-link chips + 15 FAQ accordions across 5 categories ✓
+- FAQ accordions: all questions render (verified "How do I create my first studio?", "Do I need a product photo to start?", etc.) ✓
+- Image Detail: 5 actions in bottom bar — Save, Edit, Variations (new), Download, Share ✓
+- Variations entry accessible from both the bottom bar and the ⋯ action sheet ✓
+- Full flow verified: Projects → Project Detail → Open in studio → Results → Image Detail → Variations button present ✓
+- No console errors ✓
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+
+Stage Summary:
+- Help/FAQ screen replaces placeholder — 5 categories, 15 questions, quick links, contact card ✓
+- Image Variations feature — generate 3 alternative compositions of any image, with loading animation, select/favorite/download, and merge into results ✓
+- Variations API route — product-preserving variation prompts, saves to /public/generated/ ✓
+- Image Detail now has 5 actions (was 4): Save, Edit, Variations, Download, Share ✓
+- Total screens: 27 (was 25) — added Help, Variations
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

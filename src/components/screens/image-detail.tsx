@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useApp } from "@/lib/store";
 import { Screen } from "@/components/studio/screen";
 import { ScreenHeader } from "@/components/studio/screen-header";
-import { Heart, Pencil, Download, Share2, MoreHorizontal } from "lucide-react";
+import { Heart, Pencil, Download, Share2, MoreHorizontal, Sparkles } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -141,6 +141,14 @@ export function ImageDetailScreen() {
                   }}
                 />
                 <SheetItem
+                  icon={<Sparkles className="h-5 w-5" />}
+                  label="Create variations"
+                  onClick={() => {
+                    setSheetOpen(false);
+                    navigate("variations");
+                  }}
+                />
+                <SheetItem
                   icon={<Download className="h-5 w-5" />}
                   label="Download"
                   onClick={() => {
@@ -188,6 +196,11 @@ export function ImageDetailScreen() {
               icon={<Pencil className="h-6 w-6" />}
               label="Edit"
               onClick={() => navigate("edit-image")}
+            />
+            <ActionIcon
+              icon={<Sparkles className="h-6 w-6" />}
+              label="Variations"
+              onClick={() => navigate("variations")}
             />
             <ActionIcon
               icon={<Download className="h-6 w-6" />}

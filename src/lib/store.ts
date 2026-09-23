@@ -239,6 +239,8 @@ export const useApp = create<AppState>((set, get) => ({
         settings: "more",
         lookbook: "shop",
         onboarding: "home",
+        help: "more",
+        variations: "studio",
         "studio-product": "studio",
         "studio-model": "studio",
         "studio-scene": "studio",

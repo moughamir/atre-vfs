@@ -101,7 +101,7 @@ export function MoreScreen() {
         {
           icon: HelpCircle,
           label: "Help",
-          onClick: () => pushToast({ title: "Help center coming soon" }),
+          onClick: () => navigate("help"),
         },
         {
           icon: MessageSquare,

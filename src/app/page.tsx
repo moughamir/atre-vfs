@@ -29,6 +29,8 @@ import { FavoritesScreen } from "@/components/screens/favorites";
 import { SettingsScreen } from "@/components/screens/settings";
 import { OnboardingScreen } from "@/components/screens/onboarding";
 import { LookbookScreen } from "@/components/screens/lookbook";
+import { HelpScreen } from "@/components/screens/help";
+import { VariationsScreen } from "@/components/screens/variations";
 
 import { Loader2 } from "lucide-react";
 
@@ -126,6 +128,10 @@ export default function Home() {
         return <OnboardingScreen />;
       case "lookbook":
         return <LookbookScreen />;
+      case "help":
+        return <HelpScreen />;
+      case "variations":
+        return <VariationsScreen />;
       default:
         return <HomeScreen />;
     }

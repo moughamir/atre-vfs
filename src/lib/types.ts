@@ -27,7 +27,9 @@ export type ScreenId =
   | "project-detail"
   | "settings"
   | "onboarding"
-  | "lookbook";
+  | "lookbook"
+  | "help"
+  | "variations";
 
 export type ModelOption = "none" | "woman" | "man" | "custom";
 export type ModelPreference = "natural" | "elegant" | "editorial";
