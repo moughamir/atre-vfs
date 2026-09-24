@@ -70,6 +70,9 @@ export function AddProductScreen({ editing }: AddProductScreenProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ dataUrl, name: name || "product" }),
         });
+        if (!res.ok) {
+          throw new Error("Upload failed");
+        }
         const data = await res.json();
         if (data.url) setImages((prev) => [...prev, data.url]);
       }
@@ -126,6 +129,9 @@ export function AddProductScreen({ editing }: AddProductScreenProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        throw new Error("Save failed");
+      }
       const data = await res.json();
       if (data.product) {
         pushToast({

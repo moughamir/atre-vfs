@@ -88,6 +88,7 @@ export function PublishScreen() {
           style: studio.style,
         }),
       });
+      if (!res.ok) throw new Error("Description failed");
       const data = await res.json();
       if (data.description) setDescription(data.description);
     } catch {
@@ -123,6 +124,7 @@ export function PublishScreen() {
           images,
         }),
       });
+      if (!res.ok) throw new Error("Publish failed");
       const data = await res.json();
       if (data.listing) {
         addListing(data.listing);

@@ -634,3 +634,44 @@ Stage Summary:
 - Each dimension card has hover-reveal edit button for quick navigation back ✓
 - Total screens: 29 (unchanged — summary was redesigned, not added)
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: BUGFIX-1
+Agent: Z.ai Code (webDevReview cron)
+Task: Fix "Unexpected token '<', "<html>..." is not valid JSON" console error
+
+Root Cause:
+- The `/api/upload` route was completely missing (entire directory `src/app/api/upload/` was gone)
+- When the Add Product screen uploaded photos, `fetch("/api/upload")` received a 404 HTML error page
+- `res.json()` then tried to parse the HTML as JSON → SyntaxError: Unexpected token '<'
+- This affected any product photo upload attempt
+
+Fix Applied:
+1. Recreated `/api/upload/route.ts`:
+   - POST handler accepts base64 data URL (`{ dataUrl, name }`)
+   - Strips data URL prefix, decodes base64, saves to `/public/products/`
+   - Returns JSON: `{ url: "/products/filename.ext" }`
+   - Returns JSON error on missing data: `{ error: "No image data provided" }` (status 400)
+   - Returns JSON error on failure: `{ error: "Upload failed" }` (status 500)
+2. Added `res.ok` check before `res.json()` in `add-product.tsx`:
+   - `if (!res.ok) { throw new Error("Upload failed"); }` before parsing JSON
+   - Prevents crash even if endpoint returns HTML
+3. Added similar defensive `res.ok` checks in:
+   - `generating.tsx` — checks res.ok, tries to parse error JSON, falls back to generic message
+   - `variations.tsx` — same pattern
+   - `publish.tsx` — both describe and publish fetch calls
+   - `add-product.tsx` — save product call
+
+Verification Results:
+- `/api/upload` with valid data returns JSON: `{"url":"/products/test-...-hash.png"}` ✅
+- `/api/upload` with no data returns JSON error: `{"error":"No image data provided"}` ✅
+- No "Unexpected token" console errors ✅
+- Lint: 0 errors, 22 warnings ✅
+- Dev server running on port 3000 (HTTP 200), upload endpoint verified working
+
+Stage Summary:
+- Root cause identified: missing `/api/upload` route directory → 404 HTML → JSON parse crash
+- Route recreated with proper base64 image handling
+- All critical fetch calls now check `res.ok` before `res.json()` to prevent similar crashes
+- Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted

@@ -86,8 +86,18 @@ export function VariationsScreen() {
           count: 3,
         }),
       });
+      if (!res.ok) {
+        let errorMsg = "Variations failed";
+        try {
+          const errData = await res.json();
+          errorMsg = errData.error ?? errorMsg;
+        } catch {
+          // Response wasn't JSON
+        }
+        throw new Error(errorMsg);
+      }
       const data = await res.json();
-      if (!res.ok || !data.images || data.images.length === 0) {
+      if (!data.images || data.images.length === 0) {
         throw new Error(data.error ?? "Variations failed");
       }
       setStep(VARIATION_STEPS.length - 1);

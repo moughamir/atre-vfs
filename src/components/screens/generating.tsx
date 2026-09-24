@@ -67,8 +67,19 @@ export function GeneratingScreen() {
           }),
         });
         if (cancelled) return;
+        if (!res.ok) {
+          // Try to parse error JSON, fall back to generic message
+          let errorMsg = "Generation failed";
+          try {
+            const errData = await res.json();
+            errorMsg = errData.error ?? errorMsg;
+          } catch {
+            // Response wasn't JSON — use generic error
+          }
+          throw new Error(errorMsg);
+        }
         const data = await res.json();
-        if (!res.ok || !data.images || data.images.length === 0) {
+        if (!data.images || data.images.length === 0) {
           throw new Error(data.error ?? "Generation failed");
         }
         if (cancelled) return;

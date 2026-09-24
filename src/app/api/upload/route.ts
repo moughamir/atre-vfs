@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
     const { dataUrl, name } = body as { dataUrl?: string; name?: string };
 
     if (!dataUrl) {
-      return NextResponse.json({ error: "No image data provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No image data provided" },
+        { status: 400 },
+      );
     }
 
     // Strip data URL prefix if present
@@ -30,7 +33,9 @@ export async function POST(req: NextRequest) {
     }
 
     const hash = crypto.randomBytes(8).toString("hex");
-    const safeName = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 20) : "img";
+    const safeName = name
+      ? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 20)
+      : "img";
     const filename = `${safeName}-${Date.now()}-${hash}.${ext}`;
     const outDir = path.join(process.cwd(), "public", "products");
     await fs.mkdir(outDir, { recursive: true });
