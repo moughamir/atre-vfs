@@ -675,3 +675,94 @@ Stage Summary:
 - Route recreated with proper base64 image handling
 - All critical fetch calls now check `res.ok` before `res.json()` to prevent similar crashes
 - Dev server running on port 3000 with keep-alive (HTTP 200), 1 project + 1 favorite persisted
+
+---
+
+Task ID: HEXARCH-1
+Agent: Z.ai Code (main)
+Task: Implement Hexagonal Architecture (Ports and Adapters) for swappable AI inference endpoints
+
+Work Log:
+- Created complete Hexagonal Architecture with 4 layers:
+  1. **Domain entities** (`src/domain/entities/`) — Pure TypeScript entities with zero external dependencies:
+     - ProductEntity, StudioProjectEntity, GenerationEntity, ListingEntity, FavoriteEntity
+     - Value objects: GenerationRequest/Result, DescriptionRequest/Result, VariationRequest/Result, FileStorageRequest/Result
+
+  2. **Ports** (`src/domain/ports/`) — Interfaces defining contracts with external systems:
+     - `ImageGenerationPort` — `generate(request)`, `providerId`, `displayName`, `isAvailable()`
+     - `ImageDescriptionPort` — `describe(request)`, same metadata
+     - `ImageVariationPort` — `createVariations(request)`, same metadata
+     - `ProductRepositoryPort` — `findAll()`, `findById()`, `create()`, `update()`, `delete()`
+     - `ProjectRepositoryPort` — `findAll()`, `findById()`, `create()`, `update()`, `delete()`, `addGeneration()`
+     - `ListingRepositoryPort` — `findAll()`, `findById()`, `create()`, `delete()`
+     - `FavoritesRepositoryPort` — `findAll()`, `add()`, `remove()`
+     - `FileStoragePort` — `save()`, `saveBase64()`, `providerId`
+
+  3. **Secondary Adapters** (`src/adapters/secondary/`) — Implementations of ports:
+     - `ZAIImageGenerationAdapter` — Wraps z-ai-web-dev-sdk for image generation
+     - `ZAIImageDescriptionAdapter` — Wraps z-ai-web-dev-sdk for LLM descriptions
+     - `ZAIImageVariationAdapter` — Wraps z-ai-web-dev-sdk for variations
+     - `PrismaProductRepository` — Prisma ORM implementation of ProductRepositoryPort
+     - `PrismaProjectRepository` — Prisma ORM implementation of ProjectRepositoryPort
+     - `PrismaListingRepository` — Prisma ORM implementation of ListingRepositoryPort
+     - `JsonFavoritesRepository` — JSON file implementation of FavoritesRepositoryPort
+     - `LocalFileStorageAdapter` — Local filesystem implementation of FileStoragePort
+
+  4. **Adapter Registry / DI Container** (`src/adapters/registry/`) — Composition root:
+     - `getImageGenerationAdapter()` — Returns active adapter based on `IMAGE_GEN_PROVIDER` env var
+     - `getImageDescriptionAdapter()` — Returns active adapter based on `DESC_GEN_PROVIDER` env var
+     - `getImageVariationAdapter()` — Returns active adapter
+     - `getProductRepository()`, `getProjectRepository()`, etc. — Return repository adapters
+     - `getFileStorage()` — Returns file storage adapter
+     - `getAvailableImageProviders()` — Lists all registered providers
+     - `getActiveImageProviderId()` — Returns the active provider ID
+     - Falls back to "zai" if the configured provider is not found
+
+  5. **Domain Services** (`src/domain/services/`) — Business logic using ports:
+     - `GenerationService` — `generate()`, `generateAndPersist()` — orchestrates image generation + project persistence
+     - `ProductService` — CRUD operations via ProductRepositoryPort
+     - `ListingService` — CRUD operations + marks product as published
+     - `DescriptionService` — AI description generation with fallback
+     - `VariationsService` — Image variation generation
+     - `ProjectService` — CRUD + addGeneration via ProjectRepositoryPort
+     - `FavoritesService` — Add/remove favorites via FavoritesRepositoryPort
+
+  6. **New API endpoint** `/api/providers`:
+     - GET returns `{ providers: [{id, name, available}], active: "zai" }`
+     - Frontend can query this to display available AI providers in settings
+
+How to add a new AI provider (e.g. Gemini, Fal.AI, Fashn):
+1. Create adapter implementing the relevant port (e.g. `ImageGenerationPort`):
+   ```typescript
+   export class GeminiImageGenerationAdapter implements ImageGenerationPort {
+     readonly providerId = "gemini";
+     readonly displayName = "Google Gemini";
+     isAvailable() { return !!process.env.GEMINI_API_KEY; }
+     async generate(request) { /* Gemini API call */ }
+   }
+   ```
+2. Register it in `src/adapters/registry/index.ts`:
+   ```typescript
+   import { GeminiImageGenerationAdapter } from "...";
+   const imageGenerationAdapters = {
+     zai: new ZAIImageGenerationAdapter(),
+     gemini: new GeminiImageGenerationAdapter(),
+   };
+   ```
+3. Set `IMAGE_GEN_PROVIDER=gemini` in env to activate it
+4. No other code changes needed — all services use ports, not concrete adapters
+
+Verification Results:
+- Lint: 0 errors, 22 warnings (unused eslint-disable directives) ✓
+- /api/providers returns `{"providers":[{"id":"zai","name":"Z.AI (GLM)","available":true}],"active":"zai"}` ✓
+- All existing APIs still work (products, projects, listings, favorites) ✓
+- Dev server running on port 3000 (HTTP 200) ✓
+- Persisted data intact (2 projects, 2 favorites) ✓
+
+Stage Summary:
+- Hexagonal Architecture fully implemented with 4 layers: entities → ports → adapters → services ✓
+- Adapter registry serves as DI container — switch providers via env var without code changes ✓
+- To add Gemini/Fal.AI/Fashn: create adapter implementing ImageGenerationPort, register it, set env var ✓
+- New /api/providers endpoint for querying available providers ✓
+- All existing functionality preserved (zero breaking changes) ✓
+- Dev server running on port 3000 (HTTP 200), 2 projects + 2 favorites persisted
